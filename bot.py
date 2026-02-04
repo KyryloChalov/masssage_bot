@@ -1,11 +1,31 @@
 from telegram import Bot
-from telegram.ext import ApplicationBuilder, MessageHandler, filters, CallbackQueryHandler, CommandHandler
+from telegram.ext import (
+    ApplicationBuilder,
+    MessageHandler,
+    filters,
+    CallbackQueryHandler,
+    CommandHandler,
+)
 
-from gpt import *
-from util import *
+# from gpt import *
+from gpt import ChatGptService
+from util import (
+    load_message,
+    load_prompt,
+    send_text,
+    send_photo,
+    send_text_buttons,
+    dialog_user_info_to_str,
+    show_main_menu,
+    Dialog,
+)
+import os
+from dotenv import load_dotenv
 
-TOKEN_TELEGRAM = '8447443613:AAE1Rb5onp05S6kdzd9Uzm68tP2MG24BuYY'
-TOKEN_GPT = 'javcgk/s3WVH1V/3/eY+dOWWa+jvSy1lakmEGDVwq1h8XG3bvDbbBufJJRs/pGrIDgVhny5Qag1p3K8y+oGQU63QPq/fboIxvJ4mWTNtgIoURRvFdbWYXH1labl8JDmWT3NzSRnQIdxjFkbVj3g8fT19j15aM3UaKZYyeEcjXr01VSj3XHOhnumhEb+6+T71NKnk7rSZF/y42jb6LiZcPWoa5CqlyR0o6kXRXqzr7DWNDuQEQ='
+# Читаємо ключі API з файла .env
+load_dotenv()
+TOKEN_TELEGRAM = str(os.getenv("TOKEN_TELEGRAM"))
+TOKEN_GPT = str(os.getenv("TOKEN_GPT"))
 
 bot = Bot(TOKEN_TELEGRAM)
 
@@ -15,14 +35,18 @@ async def start(update, context):
     msg = load_message("main")
     await send_photo(update, context, "main")
     await send_text(update, context, msg)
-    await show_main_menu(update, context, {
-        "start": "головне меню бота",
-        "profile": "генерація Tinder - профілю 😎",
-        "opener": "повідомлення для знайомства 🥰",
-        "message": "листування від вашого імені 😈",
-        "date": "листування із зірками 🔥",
-        "gpt": "задати питання чату GPT 🧠"
-    })
+    await show_main_menu(
+        update,
+        context,
+        {
+            "start": "головне меню бота",
+            "profile": "генерація Tinder - профілю 😎",
+            "opener": "повідомлення для знайомства 🥰",
+            "message": "листування від вашого імені 😈",
+            "date": "листування із зірками 🔥",
+            "gpt": "задати питання чату GPT 🧠",
+        },
+    )
 
 
 async def gpt(update, context):
@@ -44,18 +68,23 @@ async def date(update, context):
     dialog.mode = "date"
     msg = load_message("date")
     await send_photo(update, context, "date")
-    await send_text_buttons(update, context, msg, {
-    "date_grande": "Аріана Гранде",
-    "date_robbie": "Марго Роббі",
-    "date_zendaya": "Зендея",
-    "date_gosling": "Райан Гослінг",
-    "date_hardy": "Том Харді",
-    })
+    await send_text_buttons(
+        update,
+        context,
+        msg,
+        {
+            "date_grande": "Аріана Гранде",
+            "date_robbie": "Марго Роббі",
+            "date_zendaya": "Зендея",
+            "date_gosling": "Райан Гослінг",
+            "date_hardy": "Том Харді",
+        },
+    )
 
 
 async def date_button(update, context):
     dialog.mode = "date"
-    text = "Гарний вибір! \uD83D\uDE05 \nВаше завдання - запросити зірку на побачення за 5 повідомлень ❤️"
+    text = "Гарний вибір! \ud83d\ude05 \nВаше завдання - запросити зірку на побачення за 5 повідомлень ❤️"
     query = update.callback_query.data
     await update.callback_query.answer()
     await send_photo(update, context, query)
@@ -77,17 +106,22 @@ async def message(update, context):
     dialog.mode = "message"
     msg = load_message("message")
     await send_photo(update, context, "message")
-    await send_text_buttons(update, context, msg, {
-        "message_next": "Написати повідомлення",
-        "message_date": "Запросити на побачення",
-    })
-    dialog.list.clear()
+    await send_text_buttons(
+        update,
+        context,
+        msg,
+        {
+            "message_next": "Написати повідомлення",
+            "message_date": "Запросити на побачення",
+        },
+    )
+    dialog.list_.clear()
 
 
 async def message_dialog(update, context):
     dialog.mode = "message"
     text = update.message.text
-    dialog.list.append(text)
+    dialog.list_.append(text)
 
 
 async def message_button(update, context):
@@ -96,7 +130,7 @@ async def message_button(update, context):
     await update.callback_query.answer()
 
     prompt = load_prompt(query)
-    user_chat_history = "\n\n".join(dialog.list)
+    user_chat_history = "\n\n".join(dialog.list_)
 
     my_message = await send_text(update, context, "Думаю...")
     answer = await chatgpt.send_question(prompt, user_chat_history)
@@ -135,8 +169,11 @@ async def profile_dialog(update, context):
         dialog.user["goals"] = text
         prompt = load_prompt("profile")
         user_info = dialog_user_info_to_str(dialog.user)
+        # print("user_info: ", user_info)
 
-        my_message = await send_text(update, context, "Чат GPT 🧠 генерує ваш профіль. Зачекайте трошки")
+        my_message = await send_text(
+            update, context, "Чат GPT 🧠 генерує ваш профіль. Зачекайте трошки"
+        )
         answer = await chatgpt.send_question(prompt, user_info)
         await my_message.edit_text(answer)
 
@@ -175,7 +212,9 @@ async def opener_dialog(update, context):
         prompt = load_prompt("opener")
 
         user_info = dialog_user_info_to_str(dialog.user)
-        my_message = await send_text(update, context, "Чат GPT 🧠 генерує ваше повідомлення. Зачекайте трошки")
+        my_message = await send_text(
+            update, context, "Чат GPT 🧠 генерує ваше повідомлення. Зачекайте трошки"
+        )
         answer = await chatgpt.send_question(prompt, user_info)
         await my_message.edit_text(answer)
 
@@ -195,6 +234,7 @@ async def hello(update, context):
         await send_text(update, context, "Привіт!")
         await send_text(update, context, "Ти написав: " + update.message.text)
 
+
 # async def buttons_handler(update, context):
 #     query = update.callback_query.data
 #     if query == "start":
@@ -203,10 +243,10 @@ async def hello(update, context):
 #         await send_text(update, context, "Stopped")
 
 dialog = Dialog()
-dialog.mode = None
-dialog.list = []
-dialog.user = {}
-dialog.counter = 0
+# dialog.mode = ""
+# dialog.list_ = []
+# dialog.user = {}
+# dialog.counter = 0
 
 chatgpt = ChatGptService(token=TOKEN_GPT)
 

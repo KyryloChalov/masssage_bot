@@ -3,14 +3,14 @@ from openai import OpenAI
 
 
 class ChatGptService:
-    client: OpenAI = None
-    message_list: list = None
+    client: OpenAI
+    message_list: list
 
     def __init__(self, token):
         self.client = openai.OpenAI(base_url="https://openai.javarush.com/v1", api_key=token)
         self.message_list = []
 
-    async def send_message_list(self) -> str:
+    async def send_message_list(self):
         completion = self.client.chat.completions.create(
             model="gpt-4o",  # gpt-4o,  gpt-4-turbo,    gpt-3.5-turbo
             messages=self.message_list,
