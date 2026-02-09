@@ -1,4 +1,5 @@
 from telegram import (
+    Chat,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     Message,
@@ -15,7 +16,6 @@ from deco import log_decorator
 
 
 # конвертує об'єкт user в рядок
-@log_decorator
 def dialog_user_info_to_str(user) -> str:
     result = ""
     map = {
@@ -31,13 +31,12 @@ def dialog_user_info_to_str(user) -> str:
         "annoys": "У людях дратує",
     }
     for key, name in map.items():
-        print('key: ', key, ' name: ', name)
         if key in user:
-            print('key: ', key, ' name: ', name)
             result += name + ": " + user[key] + "\n"
     return result
 
 
+# @log_decorator
 # надсилає в чат текстове повідомлення
 async def send_text(
     update: Update, context: ContextTypes.DEFAULT_TYPE, text: str
@@ -45,8 +44,11 @@ async def send_text(
     if text.count("_") % 2 != 0:
         message = f"Рядок '{text}' є невалідним з погляду markdown. Скористайтеся методом send_html()"
         print(message)
-        return await update.message.reply_text(message)
+        return await update.effective_message.reply_text(message)
 
+    # print(update.effective_chat.first_name)
+    # print(update.effective_chat)
+    # print(update.effective_message)
     text = text.encode("utf16", errors="surrogatepass").decode("utf16")
     return await context.bot.send_message(
         chat_id=update.effective_chat.id, text=text, parse_mode=ParseMode.MARKDOWN
