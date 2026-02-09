@@ -20,15 +20,11 @@ def dialog_user_info_to_str(user) -> str:
     result = ""
     map = {
         "name": "Ім'я",
-        "sex": "Стать",
-        "age": "Вік",
-        "city": "Місто",
-        "occupation": "Професія",
-        "hobby": "Хобі",
-        "goals": "Цілі знайомства",
-        "handsome": "Краса, привабливість у балах (максимум 10 балів)",
-        "wealth": "Дохід, багатство",
-        "annoys": "У людях дратує",
+        "phone": "Номер телефону",
+        "massage_type": "Вид масажу",
+        "date_time": "Час та дата замовлення",
+        "address": "Адреса",
+        "comment": "Коментар",
     }
     for key, name in map.items():
         if key in user:
@@ -67,13 +63,21 @@ async def send_html(
 
 # надсилає в чат текстове повідомлення та додає до нього кнопки
 async def send_text_buttons(
-    update: Update, context: ContextTypes.DEFAULT_TYPE, text: str, buttons: dict
+    update: Update, context: ContextTypes.DEFAULT_TYPE, text: str, buttons: dict, columns: int = 2
 ) -> Message:
     text = text.encode("utf16", errors="surrogatepass").decode("utf16")
     keyboard = []
-    for key, value in buttons.items():
+    row = []
+    for i, (key, value) in enumerate(buttons.items()):
         button = InlineKeyboardButton(str(value), callback_data=str(key))
-        keyboard.append([button])
+        row.append(button)
+        # when row is full, push it to keyboard and start a new row
+        if (i + 1) % columns == 0:
+            keyboard.append(row)
+            row = []
+    # append any remaining buttons
+    if row:
+        keyboard.append(row)
     reply_markup = InlineKeyboardMarkup(keyboard)
     return await update.message.reply_text(
         text, reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN
