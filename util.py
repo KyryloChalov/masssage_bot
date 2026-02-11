@@ -14,6 +14,18 @@ from telegram.ext import ContextTypes
 
 from deco import log_decorator
 
+# формує header: фото + текст + кнопки
+async def header(update, context, buttons: dict = {}):
+    await send_photo(update, context, dialog.mode)
+    msg = load_message(dialog.mode)
+    dialog.list_.clear()
+    dialog.user.clear()
+    print('from header  >>>  dialog: ', dialog.mode, dialog.list_, dialog.user) # debug
+    if buttons == {}:
+        await send_text(update, context, msg)
+    else:
+        await send_text_buttons(update, context, msg, buttons)
+
 
 # конвертує об'єкт user в рядок
 def dialog_user_info_to_str(user) -> str:
@@ -148,10 +160,10 @@ class Dialog:
     mode: str
     list_: list
     user: dict
-    counter: int
 
-    def __init__(self):
-        self.mode = ""
-        self.list_ = []
-        self.user = {}
-        self.counter = 0
+    def __init__(self, mode="", list_=[], user={}):
+        self.mode = mode
+        self.list_ = list_
+        self.user = user
+
+dialog = Dialog()
