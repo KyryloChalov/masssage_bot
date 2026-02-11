@@ -19,10 +19,11 @@ from deco import log_decorator
 def dialog_user_info_to_str(user) -> str:
     result = ""
     map = {
+        "time": "Від",
         "name": "Ім'я",
         "phone": "Номер телефону",
         "massage_type": "Вид масажу",
-        "date_time": "Час та дата замовлення",
+        "date_time": "Час та дата масажу",
         "address": "Адреса",
         "comment": "Коментар",
     }
@@ -79,9 +80,23 @@ async def send_text_buttons(
     if row:
         keyboard.append(row)
     reply_markup = InlineKeyboardMarkup(keyboard)
-    return await update.message.reply_text(
-        text, reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN
-    )
+    # reply in a way that works for both message and callback_query contexts
+    if getattr(update, "effective_message", None) is not None:
+        return await update.effective_message.reply_text(
+            text, reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN
+        )
+    # fallback to bot.send_message when no message object is available
+    chat_id = None
+    if getattr(update, "effective_chat", None) is not None:
+        chat_id = update.effective_chat.id
+    elif getattr(update, "message", None) is not None:
+        chat_id = update.message.chat.id
+    if chat_id is not None:
+        return await context.bot.send_message(
+            chat_id=chat_id, text=text, reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN
+        )
+    # last resort: raise informative error
+    raise RuntimeError("No chat/message available to send buttons reply")
 
 
 # надсилає в чат фото
