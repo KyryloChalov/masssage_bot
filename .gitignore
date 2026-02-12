@@ -17,3 +17,7 @@
 *.tar.gz
 demo_*.*
 test_*.*
+*.* copy
+*.bak
+*.tmp
+*.env copy
