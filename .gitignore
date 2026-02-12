@@ -15,3 +15,5 @@
 *.psd
 *.zip
 *.tar.gz
+demo_*.*
+test_*.*

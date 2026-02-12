@@ -76,25 +76,11 @@
 Q: Що таке `Home.Masssage`?,
 A: `Home.Masssage` - компанія, що надає послуги масажу там, де зручно замовникові (вдома, в готелі, в офісі тощо),
 
-Q: What is `Home.Masssage`?,
-A: `Home.Masssage` is a company providing massage services at the customer's place (at home, at hotel, at office etc., upon customer's choice).,
-
-Q: Что такое `Home.Masssage`?,
-A: `Home.Masssage` - компания, которая предоставляет услуги массажа там, где удобно заказчику (дома, в гостинице, в офисе и др.),
-	
 
 Q: Де працює `Home.Masssage`?,
 A: Зараз ми обслуговуємо Київ та його околиці, але плануємо з часом  надавати послуги і в інших містах України.
 		     Ви можете дізнатися про місця, які ми обслуговуємо, 'https://home.masssage.kyiv.ua/therapist/cities/index.php?lang=ua',
 
-Q: Which zones does `Home.Masssage` cover?,
-A: Now we provide services in Kyiv and suburbs, and we gradually expand our coverage to other cities of Ukraine.
-		     List of places we provide services in is at 'https://home.masssage.kyiv.ua/therapist/cities/index.php?lang=en',
-
-Q: Где работает `Home.Masssage`?,
-A: Сейчас мы обслуживаем город Киев и его окрестности, планируем со временем предоставлять услуги и в других городах Украины.
-	         Вы можете узнать о местах, которые мы обслуживаем, 'https://home.masssage.kyiv.ua/therapist/cities/index.php?lang=ru',
-	
 
 Q: Як мені замовити масаж?,
 A: Це швидко і просто:
@@ -102,112 +88,46 @@ A: Це швидко і просто:
 			2) Замовте сеанс масажу телефоном, за номером +38 (093) 390-33-57 або заповніть онлайн-форму  на сторінці 'http://home.masssage.kyiv.ua/contact-us/book-online/index.php?lang=ua'
 			Примітка:  Призначення вважається остаточним тільки після підтвердження телефоном (подзвоніть нам, щоб замовити сеанс, або ж ми передзвонимо Вам після замовлення через онлайн-форму).,
 
-Q: How do I book a massage?,
-A: It is quick &amp; simple:
-			1) Choose type of massage from section 'https://home.masssage.kyiv.ua/services/category.php?lang=en'.
-			2) Book a massage session by phone +38 (093) 390-33-57 or fill in our online form at Contact us 'http://home.masssage.kyiv.ua/contact-us/book-online/index.php?lang=en'
-			Note: An appointment is considered final only upon phone confirmation (call us to book a session, or we call you if you choose to book a session via our online form).,
-
-Q: Как мне заказать массаж?,
-A: Это быстро и просто:
-			1) Выберите вид массажа в разделе 'https://home.masssage.kyiv.ua/services/category.php?lang=ru'>Массаж</a>, в соответствии с Вашими пожеланиями
-			2) Закажите сеанс массажа по телефону +38 (093) 390-33-57 или заполните 'http://home.masssage.kyiv.ua/contact-us/book-online/index.php?lang=ru'
-	        Примечание:  Назначение считается окончательным только после подтверждения по телефону (позвоните нам, чтобы заказать сеанс, или же мы перезвоним после заказа через онлайн-форму),
-	
 
 Q: Де проходить сеанс масажу?,
 A: Місце проведення сеансу вибираєте Ви: масаж можна проводити в Вашій оселі, в готелі, в офісі або будь-якому іншому зручному для Вас місці.
 Масаж виконується на зручному масажному столі, з яким до Вас приходить наш масажист. Він також потурбується про масажне масло та інші матеріали.
 Хочемо підкреслити, що наша компанія надає виключно професійні послуги масажу, як зазначено в розділі 'http://home.masssage.kyiv.ua/services/index.php?lang=ua',
 
-Q: Where does a massage session take place?,
-A: It is up to you: a massage session can be held at your house, at a hotel, at offiсe or any other place convenient to you.
-Massage is performed on a comfortable massage table, brought by therapist. Massage oil is also provided by a massage therapist
-Due to the personal contact that is involved in a massage session, we emphasize that our company provides exclusively professional massage services as listed at the 'http://home.masssage.kyiv.ua/services/index.php?lang=en',
 
-Q: Где проходит сеанс массажа?,
-A: Место проведения сеанса выбираете Вы: массаж можно делать в Вашем доме, в гостинице, в офисе или любом другом удобном для Вас месте.
-				Массаж проводится на удобном массажном столе, с которым приходит к Вам массажист. Массажное масло также обеспечивает массажист
-				Хотим подчеркнуть, что `Home.Masssage` предоставляет исключительно профессиональные услуги массажа, как указано в разделе 'http://home.masssage.kyiv.ua/services/index.php?lang=ru',
-	
 
 Q: Коли масажисти компанії `Home.Masssage` надають послуги масажу?,
 A: Наш контакт-центр і послуги доступні для клієнтів цілодобово, кожного дня без вихідних (з понеділка до неділі).
 Вночі, з 23:00 до 07:00 включно, вартість послуг буде збільшена мінімум вдвічі,
 
-Q: Which is the working schedule of Home Massage therapists?,
-A: Our contact-center and our services are available to our customers on every day of the week (from Monday to Sunday) 24 hours per day.
-At night, from 11 pm till 7 am inclusively, price will be increased by two or more times,
 
-Q: Какое время работы компании `Home.Masssage`?,
-A: Наш контакт-центр и услуги доступны для клиентов круглосуточно, каждый день недели (с понедельника по воскресенье)
-			В ночное время, с 23:00 до 07:00 включительно, цена на услуги будет выше в 2 или более раза,
-	
 
 Q: Коли приїде масажист?,
 A: У будь-який час згідно з Вашим запитом, якщо потрібний Вам масажист на цей момент вільний.
 	Необхідно робити замовлення  мінімум за дві години до початку сеансу масажу, з очевидних причин. А ще краще замовляти сеанс масажу напередодні.,
 
-Q: When will a therapist come to my place?,
-A: Whenever you ask us, as long as the therapist of your choice is available at time period convenient for you.
-	All sessions need to be booked at least 2 hours in advance for obvious reasons. The best way is to book a session at least a day before.,
-
-Q: Когда приедет массажист?,
-A: В любое время по Вашему запросу, если нужный Вам массажист в данный момент свободен
-			По очевидным причинам, желательно делать заказ минимум за два часа до начала сеанса массажа. Ещё лучше заказывать сеанс массажа накануне или за 2-3 дня,
-	
 
 Q: Скільки коштують масажні послуги, які Ви надаєте?,
-A: Ціна на всі види масажу `Home.Masssage` складає $price грн за годину
+A: Ціна на всі види масажу `Home.Masssage` складає 1200 грн за годину
 			Детальну інформацію про ціну та особливі умови надано в розділі 'http://home.masssage.kyiv.ua/prices/index.php?lang=ua',
 
-Q: What are the prices for your services?,
-A: Price for all types of massage provided by `Home.Masssage` is UAH $price per hour
-			See more details and special offers at 'http://home.masssage.kyiv.ua/prices/index.php?lang=en',
-
-Q: Сколько стоят массажные услуги, которые Вы предоставляете?,
-A: Единая цена на все виды массажа в `Home.Masssage` сейчас составляет $price грн в час
-			Подробнее о ценах и особых условиях можно узнать в разделе 'http://home.masssage.kyiv.ua/prices/index.php?lang=ru',
-	
 
 Q: Як можна оплатити масаж?,
 A:  Оплату сеансу можна здійснити двома способами:
 	а) Готівкою масажистові, після закінчення сеансу.
 	б) Переказом на банківську картку.,
 
-Q: How to pay for a massage session?,
-A: There are 2 ways to pay us:
-	        1) Promptly after the session, to the therapist in cash.
-	        2) Via bank transfer.,
 
-Q: Как можно оплатить массаж?,
-A:  Оплату можно осуществить до или после сеанса массажа любым из способов:
-			1) Наличными массажисту
-			2) Переводом на банковскую карту,
-	
 
 Q: Як я можу дізнаватися про спеціальні пропозиції та знижки?,
 A: Інформація про спеціальні пропозиції та знижки публікується на сайті.
 	Діють знижки для постійних клієнтів.,
 
-Q: Could I be informed about special offers and discounts?,
-A: Information about special offers is posted on the website.
-        	We provide individual discounts for regular customers.,
-
-Q: Как я могу узнавать о специальных предложениях и скидках?,
-A: Информация о специальных предложениях и скидках публикуется на сайте
-			Для постоянных клиентов действуют скидки,
 
 
 Q: Я можу подарувати масаж?,
 A: Звичайно! Ви завжди можете швидко замовити подарунковий сертифікат у розділі 'http://home.masssage.kyiv.ua/certificate/index.php?lang=ua' на сайті.,
 
-Q: Can I make a special massage gift to a beloved one/friend/relative of mine?,
-A: Of course! You can do this quite quickly and simply at 'http://home.masssage.kyiv.ua/certificate/index.php?lang=en' section of our website.,
-
-Q: Я могу подарить массаж?,
-A: Конечно! Вы всегда можете заказать подарочный сертификат в разделе 'http://home.masssage.kyiv.ua/certificate/index.php?lang=ru',
-	
 
 Q: Що робити після того, як я забронював масаж?,
 A: Все, що Вам варто зробити, - розслабитися і отримувати задоволення від наших послуг.
@@ -216,19 +136,7 @@ A: Все, що Вам варто зробити, - розслабитися і 
 	Вам необхідно повідомити масажисту про будь-які можливі проблеми зі здоров'ям та недавні травми, а також про алергію, що може виникнути через олію для тіла (втім, наші масажисти застосовують гіпоалергенну олію).
 	Під час сеансу Ви можете розповісти масажисту про своє самопочуття або попросити про якісь зміни в процедурі.,
 
-Q: Upon a session is booked, what is the procedure?,
-A: A great thing you can do is just relax and get in the mood of the whole philosophy behind our services. Massage means pleasure, so the best thing one can do to enjoy it is to enter the right state of mood: Relaxed and happy. Moreover, both for your own well being and for reasons of 'savoir vivre', it is suggested that you take a shower before the arrival of the therapist at your place.
-	Eventually, your desired session begins with the arrival of the therapist. You may inform them of any possible health issues or recent injuries, as well as any allergies you may have in body oils.
-	As the session progresses, you may talk to the therapist anytime about how you feel or whether you want them to make any changes in their treatment.,
 
-Q: Что делать после того, как я забронировал массаж?,
-A: Все, что Вам стоит сделать, - расслабиться и получать удовольствие от наших услуг.
-				Массаж - это блаженство, поэтому лучший способ ощутить его в полной мере - войти в правильное состояние духа: быть расслабленным и счастливым.
-				Также советуем принять душ перед приходом массажиста (жедательно не использовать косметических средств с сильным запахом!)
-			Сеанс массажа начнется с момента прибытия массажиста.
-				Вам необходимо сообщить массажисту о возможных проблемах со здоровьем и недавних травмах, а также об аллергических реакциях, которые может возникнуть из-за масла для тела.
-			Во время сеанса Вы можете рассказать массажисту о своем самочувствии или попросить о каких-либо изменениях процедуры.,
-	
 
 Q: Чи потрібен масаж здоровій людині?,
 A: Однозначно потрібен. По-перше, ідеально здорових людей в природі не існує. По-друге,
@@ -236,50 +144,24 @@ A: Однозначно потрібен. По-перше, ідеально зд
 особистий імунітет (і життєвий тонус). Імуномодулятори, рекомендовані лікарями, мають загальний вплив, а
 масаж, як засіб індивідуального впливу, підвищує саме ваш імунітет.,
 
-Q: Does a healthy person need a massage session?,
-A: Definitely it is needed. First, there are no perfectly healthy people. Second,
-it is easier to prevent the disease than to eliminate it. That is why the massage is needed by everyone, because it, at least, raises yours personal immunity (and vital tone). Immunomodulators, recommended by doctors, have a general effect, while a massage, as individual means, increases your immunity.,
 
-Q: Нужен ли массаж здоровому человеку?,
-A: Однозначно нужен. Во-первых, идеально здоровых людей в природе не существует. Во-вторых, болезнь легче предупредить, чем победить. Именно поэтому массаж нужен всем, поскольку он, как минимум, повышает ваш личный иммунитет (и жизненный тонус). Иммуномодуляторы, рекомендуемые врачами, оказывают общее воздействие, а массаж, как индивидуальное воздействие, повышает именно ваш иммунитет.,
-	
 
 Q: Які види масажу Ви пропонуєте здоровим людям?,
 A: Відносно здоровим людям, при відсутності протипоказань, можна замовлюяти будь-які масажі із списку 'http://home.masssage.kyiv.ua/services/category.php?lang=ua'
 	         На початок ми пропонуємо 'http://home.masssage.kyiv.ua/services/item.php?idService=13&lang=ua', 'http://home.masssage.kyiv.ua/services/item.php?idService=22&lang=ua', 'http://home.masssage.kyiv.ua/services/item.php?idService=1&lang=ua', 'http://home.masssage.kyiv.ua/services/item.php?idService=17&lang=ua' массажі. Бажана періодичність - не рідше одного курсу на рік, а краще -
 два курси на рік. Це дозволить вам уникати застуди, ГРВІ, бути в тонусі, добре спати тощо.,
 
-Q: What massage types do you offer for healthy people?,
-A: Relatively healthy pople, having no contraindications, may order any massages from the list 'http://home.masssage.kyiv.ua/services/category.php?lang=en'
-	         We offer to start with 'http://home.masssage.kyiv.ua/services/item.php?idService=13&lang=en', 'http://home.masssage.kyiv.ua/services/item.php?idService=22&lang=en', 'http://home.masssage.kyiv.ua/services/item.php?idService=1&lang=en', 'http://home.masssage.kyiv.ua/services/item.php?idService=17&lang=en'. Desirable periodicity is at least one course a year, and preferably two courses per year. It will allow avoiding colds, acute respiratory infections, be in good shape, sleep well, etc.,
 
-Q: Какие виды массажа Вы предлагаете здоровым людям?,
-A: Людям относительно здоровым, при отсутствии противопоказаний, можно принимать любые массажи из списка 'http://home.masssage.kyiv.ua/services/category.php?lang=ru'
-	         Для начала мы обычно предлагаем 'http://home.masssage.kyiv.ua/services/item.php?idService=13&lang=ru', 'http://home.masssage.kyiv.ua/services/item.php?idService=22&lang=ru', 'http://home.masssage.kyiv.ua/services/item.php?idService=1&lang=ru', 'http://home.masssage.kyiv.ua/services/item.php?idService=17&lang=ru' массажи. Желательная периодичность - не реже одного курса в год, а лучше – два курса в год. Это позволит вам избегать простуды, ОРВИ, быть в тонусе, хорошо спать и тд.,
-	
 
 Q: Коли стануть помітні результати масажу?,
 A: Відчутні результати Ви помітите після декількох сеансів масажу. У деяких випадках Ви  матимете результат відразу після першого сеансу. Ви відчуєте тепло, розслаблення, зменшення або повне  зникнення болю,
 
-
-Q: When will I get visible results from massage?,
-A: You will get visible results after several massage sessions. In some cases, you will receive a result immediately after the first session. You will experience warmth, relaxation, decrease or complete elimination of pain,
-
-Q: Когда появятся результаты массажа?,
-A: Ощутимые результаты Вы получите после нескольких сеансов массажа. В некоторых случаях Вы получите результат сразу после первого сеанса. Вы ощутите прилив тепла, расслабление, уменьшение или полное исчезновение боли,
-	
 
 
 Q: Скільки триває сеанс масажу?,
 A: Зазвичай сеанс масажу триває 60-90 хвилин. За 60 хвилин можна обробити якусь одну зону: спина+шия, ноги. За 90 хвилин масажист встигне обробити усе тіло. За дві години можна зробити загальний масаж із глибокою обробкою м'язових груп. За Вашим бажанням масаж може тривати й довше.,
 
 
-Q: How long does the massage session last?,
-A: Typically, the massage session lasts 60-90 minutes. In 60 minutes you can get treated a single area: back + neck, legs. During 90 minutes the therapist will have time to treat entire body. In two hours you can get whole body massage with deep treatment of muscle groups. Upon request the massage may last longer.,
-
-Q: Сколько продолжается сеанс массажа?,
-A: Обычно сеанс массажа продолжается 60-90 минут. За 60 минут можно промассировать какую-то одну область: спина+шея, ноги. За 90 минут массажист успевает промассировать все тело. Два часа позволяют сделать общий массаж с серьезной проработкой мышечных групп. По Вашему желанию, массаж может продолжаться и дольше.,
-	
 
 Q: Скільки сеансів масажу та з якою періодичністю необхідно зробити?,
 A: Короткий інтенсивний курс масажу складається з 10 сеансів, виконаних через день-два. Середній  курс становить 15-20 сеансів. 
@@ -288,30 +170,10 @@ A: Короткий інтенсивний курс масажу складає�
 			Також можна замовляти масаж 'на вимогу' - одиничні сеанси після втоми,  після стресу, щоб відпочити та розслабитися тощо,
 
 
-Q: How many sessions and how often should I take,
-A: A short intensive massage course consists of 10 sessions, performed in a day or two.
-Average course is 15-20 sessions.
-			If you want massage courses, then repeat them preferably once or twice a year.
-			If you want massage for prevention, order it 1 time a week on a permanent basis.
-			You can also order massage 'on demand', i.e., single sessions after high loads, stress in order to relax and unwind, etc.,
-
-Q: Сколько сеансов массажа необходимо сделать и с какой периодичностью?,
-A: Короткий интенсивный курс массажа состоит из 10 сеансов, проводимых  через день-два. Средний курс 15-20 сеансов. 
-			Если Вы делаете массаж курсами, то повторять их желательно один-два раза в год. 
-			Если Вы хотите проводить массаж с профилактической целью, то можно делать массаж 1 раз в неделю постоянно.
-			Также можно делать массаж 'по требованию' - единичные сеансы после тяжелой усталости, после стресса, просто чтобы отдохнуть и рассалабиться и т.д.,
-	
 
 Q:  Чи можна їсти перед масажем?,
-	a_ua=>Бажано робити масаж не раніше, ніж через 1 годину після вживання їжі,
+	Бажано робити масаж не раніше, ніж через 1 годину після вживання їжі,
 
-
-Q: May I take a meal before a massage?,
-	a_en=>It is advisable to get massage no earlier than 1 hour after meal,
-
-Q: Можно ли есть перед массажем?,
-	a_ru=>Желательно делать массаж не раньше, чем через 1 час после приема пищи.,
-	
 
 Q: У чому ж користь масажу?,
 A: Ще в далекій давнині масаж був відомий як лікувальний засіб
@@ -322,25 +184,6 @@ A: Ще в далекій давнині масаж був відомий як �
 			Масаж – не тільки ефективний лікувальний засіб, але й засіб профілактичний, для попередження найрізноманітніших захворювань. Якщо ви почуваєте себе втомленим, розбитим і потребуєте  відновлення самопочуття й працездатності, замовте оздоровчі процедури - наприклад, загальний масаж.  Відчуття легкості й радості після оздоровчого масажу важко описати, це потрібно відчути. Для цього рекомендується проводити оздоровчі процедури 1-2 рази у місяць.
 			 За допомогою масажу ми активуємо нашу «внутрішню аптеку». Масаж допомагає нам  упоратися із проблемами здоров'я без ліків, за допомогою власних резервів організму. Масаж – потужний  інструмент у руках фахівця, який дозволяє впливати на стан пацієнта, - правда, результати такого впливу  цілком залежать від того, у чиїх руках перебуває цей інструмент,
 
-
-Q: Why is massage so useful?,
-A: Even in ancient times, massage was known as a remedy.
-			The word 'massage' literally means 'manipulating the soft tissues of the body with the hands'. In naturopathy massage takes a very important place in the treatment of diseases of all kinds. For centuries massage was used as a curative in India, Greece, Rome, China, Egypt and many other countries.
-			Massage and its medicinal and curative properties
-			Massage is applied to improve blood circulation, recover and improve tissues after injury, eliminate muscle cramps and improve muscle tone. Massage also reduces muscle tension and pain, cleans skin pores and, thus, removes toxins from the body. Massage also speeds up blood circulation, reducing swelling, reduces tension of the nerves and ensures soothing. Massage stimulates the digestive system and activates the urinary system.
-			Massage for healthy people
-			Massage is not only an effective remedy, but also prevention of development of a variety of diseases. If you feel tired, overwhelmed and need to recover well-being and working capacity, take wellness procedures, for example, full-body massage. It is difficult to describe the feeling of lightness and joy of life after a wellness massage; it must be felt. To feel it for sure, take a course or get massage at least 1-2 times a month.
-			With the help of massage we activate our 'internal pharmacy'. Massage helps us to cope with health problems without medicines, but activating our body's reserves. Massage is a powerful tool in the hands of a specialist, allowing to influence the patient's condition - however, the results of such influence entirely depend on the person who applies it.,
-
-
-Q: В чём польза массажа?,
-A: Еще в глубокой древности массаж был известен как лечебное средство.
-			Слово 'массаж' буквально означает 'манипуляция мягкими тканями тела с помощью рук'. В натуропатии массаж занимает очень важное место при лечении болезней всех видов. В течение многих столетий массаж использовался как целебное средство в Индии, Греции, Риме, Китае, Египте и множестве других стран.
-			Массаж и его лечебные свойства
-			Массаж используется для улучшения кровообращения, ускорения и улучшения сращивания тканей после травм, уменьшения отёчности, уменьшения мускульных судорог и улучшения мышечного тонуса. Массаж уменьшает напряжённость мускулов и снижает боль, открывает поры кожи и, таким образом, выводит токсины из тела. Массаж также ускоряет кровообращение, уменьшая опухоли (отёки), уменьшая напряжённость нервов и успокаивая их. Массаж стимулирует пищеварительную систему и активизирует уринарную систему.
-			Массаж - здоровым людям
-			Массаж – не только эффективное лечебное средство, но и средство профилактическое, предупреждения развитие самых разных заболеваний. Если вы чувствуете себя усталым, разбитым и нуждаетесь в восстановлении самочувствия и работоспособности, примите оздоровительные процедуры - например, общий массаж. Ощущение легкости и радости жизни после оздоровительного массажа трудно описать - это нужно чувствовать. А для того чтобы почувствовать, оздоровительные процедуры рекомендуется проводить 1-2 раза в месяц.
-			С помощью массажа мы задействуем нашу «внутреннюю аптеку». Массаж помогает нам справиться с проблемами здоровья без лекарств, при помощи собственных резервов организма. Массаж – мощный инструмент в руках специалиста, позволяющий влиять на состояние пациента, - правда, результаты такого воздействия целиком зависят от того, в чьих руках этот инструмент находится.,
 	
 
 Q: У чому переваги масажу вдома?,
@@ -351,34 +194,10 @@ A: Виклик масажиста додому - найбільш ефекти�
              4) Після сеансу Вам не потрібно розтрачувати отриманий приплив бадьорості й позитивних емоцій на  поїздку додому,
 
 
-Q: Why to choose outcall massage at one's place?,
-A: Outcall massage is the most effective and convenient option:
-             1) You do not have to go anywhere for a session;
-             2) You appoint convenient time;
-             3) The session is at your place, in a familiar atmosphere that gives you an extra feeling of comfort and security;
-             4) After the session, you do not need to waste the flow of vivacity and positive emotions to get home,
-
-
-Q: В чём преимущества массажа на дому?,
-A: Вызов массажиста на дом - наиболее эффективный и удобный вариант:
-             1) Вам не придется никуда идти или ехать на сеанс;
-             2) Именно Вы назначаете удобное Вам время;
-             3) Сеанс проходит у Вас дома, в привычной для Вас обстановке, что обеспечивает ощущение дополнительного комфорта и защищённости;
-             4) После сеанса Вам не нужно растрачивать полученный прилив бодрости и положительных эмоций на поездку домой.,
-	
-
 Q: Чи можу я залишити відгук про масажиста?,
 A: Безумовно. Ми вдячні нашим клієнтам за кожен відгук.
 	         У профілі кожного з наших 'https://home.masssage.kyiv.ua/therapist/index.php?lang=ua' є розділ 'Відгуки', де Ви можете залишити свій відгук про масажиста.,
 
-Q: May I leave comments and feedback about the therapist?,
-A: For sure. We are grateful for our customers for every comment.
-	         Every profile of our 'https://home.masssage.kyiv.ua/therapist/index.php?lang=en' includes section 'Feedback' for you to post your comment about this therapist.,
-
-Q: Могу ли я оставить отзыв о массажисте?,
-A: Конечно. Мы благодарны нашим клиентам за каждый отзыв.
-	         В профиле каждого из наших 'https://home.masssage.kyiv.ua/therapist/index.php?lang=ru' есть раздел 'Отзывы' где Вы можете оставить свой отзыв о массажисте.,
-	
 
 
 ## 12. КРИТИЧНО ВАЖЛИВІ ІНСТРУКЦІЇ
@@ -389,7 +208,7 @@ A: Конечно. Мы благодарны нашим клиентам за к
 
 5. НЕ використовувати агресивні продажні фрази
 6. Завжди бути ввічливим та дружелюбним
-7. Відповідати коротко для категорії 3, детально для категорій 1-2
+7. Відповідати коротко 
 
 10. НЕ використовувати жодних спеціальних символів для форматування
 11. Писати ТІЛЬКИ звичайним текстом

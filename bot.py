@@ -106,8 +106,8 @@ async def gpt_dialog(update, context):
     print("text: ", text)
     user_chat_history = "\n\n".join(dialog.list_)
 
-    # prompt = load_prompt("home_masssage")
-    prompt = load_prompt(dialog.mode)
+    prompt = load_prompt("home_masssage")
+    # prompt = load_prompt(dialog.mode)
     # використовуємо dialog.mode, щоб завантажити відповідний prompt для кожного режиму, а не тільки для gpt
 
     my_message = await send_text(update, context, " . . . ")
