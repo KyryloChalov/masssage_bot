@@ -25,7 +25,17 @@ from order_util import (
     order_certificate,
     order_certificate_button,
 )
-from buttons import BUTTONS_MAIN, BUTTONS_MENU, BUSINESS_INFO, SYSTEM_PROMPT, FAQ
+from buttons import (
+    BUTTONS_MAIN,
+    BUTTONS_ORDER_SERVICE,
+    # BUTTONS_MASSAGE,
+    MODE_MAPPING,
+    BUTTONS_MENU,
+    BUSINESS_INFO,
+    SYSTEM_PROMPT,
+    FAQ,
+    BUTTONS_SERVICE,
+)
 
 # =======================
 # Load API keys
@@ -33,6 +43,8 @@ from buttons import BUTTONS_MAIN, BUTTONS_MENU, BUSINESS_INFO, SYSTEM_PROMPT, FA
 load_dotenv()
 TOKEN_TELEGRAM = os.getenv("TOKEN_TELEGRAM")
 TOKEN_GPT = os.getenv("TOKEN_GPT")
+
+MAX_HISTORY = 5  # обмежуємо історію повідомлень до останніх 10 повідомлень
 
 
 # =======================
@@ -48,8 +60,6 @@ async def handle_gpt(update, context):
     user_text = update.message.text
     dialog.list_.append(user_text)
 
-    # обмежуємо історію до останніх 10 повідомлень
-    MAX_HISTORY = 5
     dialog.list_ = dialog.list_[-MAX_HISTORY:]
 
     user_history = "\n\n".join(dialog.list_)
@@ -79,20 +89,11 @@ async def handle_gpt(update, context):
 # =======================
 # Button mapping
 # =======================
-MODE_MAPPING = {
-    "main_helper": "helper",
-    "main_price": "price",
-    "main_location": "location",
-    "main_info": "info",
-    "main_order": "order",
-    "main_types": "massage",
-    "main_certificate": "certificate",
-}
 
 
 async def main_button(update, context):
     query = update.callback_query.data
-    print(">>>>>> main_button >>>>>>> query:", query) # debug
+    print(">>>>>> main_button >>>>>>> query:", query)  # debug
     try:
         await update.callback_query.answer()
     except Exception:
@@ -100,7 +101,7 @@ async def main_button(update, context):
 
     mode = MODE_MAPPING.get(query)
     dialog.mode = mode
-    print('mode: ', mode)
+    print("mode: ", mode)
     if mode:
         if mode == "order":
             await order(update, context)
@@ -108,6 +109,8 @@ async def main_button(update, context):
             await info(update, context)
         elif mode == "certificate":
             await order_certificate(update, context)
+        elif mode == "massage":
+            await massage(update, context)
         else:
             await set_mode(mode, update, context)
     else:
@@ -136,6 +139,50 @@ async def faq_button(update, context):
         await send_html(update, context, answer)
     else:
         await send_text(update, context, "Вибачте, відповідь недоступна.")
+
+
+# =======================
+# Massage selection buttons
+# =======================
+async def massage(update, context):
+    dialog.mode = "massage"
+    await header(update, context, BUTTONS_SERVICE)
+
+
+async def services_button(update, context):
+    query = update.callback_query.data
+    print('query: ', query) # debug
+    try:
+        await update.callback_query.answer()
+    except Exception:
+        pass
+
+    service = BUTTONS_SERVICE.get(query)
+    print('service: ', service)
+    if service:
+        dialog.mode = query
+        dialog.service = service
+        print('dialog.service: ', dialog.service)
+        await header(update, context, BUTTONS_ORDER_SERVICE)  # show header again
+        # await send_text(update, context, f"Інформація про послугу:\n\n{service}")
+    else:
+        await send_text(update, context, "Вибачте, інформація недоступна.")
+
+
+async def choice_button(update, context):
+    query = update.callback_query.data
+    try:
+        await update.callback_query.answer()
+    except Exception:
+        pass
+
+    if query == "choice_service":
+        await order(update, context, from_service=True)
+    elif query == "choice_go_back":
+        dialog.mode = "massage"
+        await massage(update, context)
+    else:
+        await send_text(update, context, "Вибачте, вибір недоступний.")
 
 
 # =======================
@@ -200,7 +247,11 @@ if __name__ == "__main__":
     app.add_handler(CallbackQueryHandler(order_phone_button, pattern="^order_phone_.*"))
     app.add_handler(CallbackQueryHandler(order_massage_button, pattern="^massage_.*"))
     app.add_handler(CallbackQueryHandler(faq_button, pattern="^faq_.*"))
-    app.add_handler(CallbackQueryHandler(order_certificate_button, pattern="^order_certificate$"))
-    app.add_handler(CallbackQueryHandler(order_certificate, pattern="^order_certificate_.*"))
+    app.add_handler(CallbackQueryHandler(services_button, pattern="^service_.*"))
+    app.add_handler(
+        CallbackQueryHandler(order_certificate_button, pattern="^order_certificate$")
+    )
+    app.add_handler(CallbackQueryHandler(choice_button, pattern="^choice_.*"))
+    # app.add_handler(CallbackQueryHandler(order_certificate, pattern="^order_certificate_.*"))
 
     app.run_polling()

@@ -9,12 +9,22 @@ BUTTONS_MAIN = {
     # "main_info": "Інформація про Home.Masssage",
 }
 
+MODE_MAPPING = {
+    "main_helper": "helper",
+    "main_price": "price",
+    "main_location": "location",
+    "main_info": "info",
+    "main_order": "order",
+    "main_types": "massage",
+    "main_certificate": "certificate",
+}
+
 BUTTONS_MENU = {
     "start": "головне меню бота",
     "order": "Замовити масаж",
     "helper": "Допомога у виборі масажу",
-    "price": "Ціна на послуги",
-    "location": "Де ми працюємо",
+    # "price": "Ціна на послуги",
+    # "location": "Де ми працюємо",
     "info": "Питання та відповіді",
     "gpt": "задати питання чату GPT 🧠",
 }
@@ -30,10 +40,31 @@ BUTTONS_MASSAGE = {
     "massage_custom": "Свій варіант 🙌",
 }
 
+BUTTONS_SERVICE = {
+    "service_full": "Загальний масаж",
+    "service_back": "Масаж спини",
+    "service_sport": "Спортивний масаж",
+    "service_cellulite": "Антицелюлітний масаж",
+    "service_office": "Офісний масаж",
+    "service_thai": "Тайський масаж",
+    "service_toksen": "Масаж Ток-Сен",
+    "service_sabai": "Масаж Сабай",
+    "service_bamboo": "Масаж Бамбуком",
+    "service_lomi": "Масаж Ломі-Ломі",
+    "service_face": "Масаж обличчя",
+    "service_certificate": "Подарунковий сертифікат",
+    "service_noname": "Ще не визначено 🙌",
+}
+
 BUTTON_CERTIFICATE = {
     "order_certificate": "Замовити сертифікат",
     # "faq_certificate": "Питання та відповіді про сертифікат",
 }
+
+BUTTONS_ORDER_SERVICE = {
+    "choice_service": "Замовити",
+    "choice_go_back": "Повернутися до вибору",
+}    
 
 # =======================
 # Business Info (структуровані дані)

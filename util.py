@@ -158,11 +158,13 @@ def load_prompt(name):
 
 class Dialog:
     mode: str
+    service: str
     list_: list
     user: dict
 
-    def __init__(self, mode="", list_=[], user={}):
+    def __init__(self, mode="", service="", list_=[], user={}):
         self.mode = mode
+        self.service = service
         self.list_ = list_
         self.user = user
 
