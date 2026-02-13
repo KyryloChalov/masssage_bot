@@ -1,5 +1,5 @@
 from telegram import (
-    Chat,
+    # Chat,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     Message,
@@ -12,19 +12,19 @@ from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
-from deco import log_decorator
+# from deco import log_decorator
 
 # формує header: фото + текст + кнопки
-async def header(update, context, buttons: dict = {}):
+async def header(update, context, buttons: dict = {}, columns: int = 2):
     await send_photo(update, context, dialog.mode)
     msg = load_message(dialog.mode)
     dialog.list_.clear()
     dialog.user.clear()
-    print('from header  >>>  dialog: ', dialog.mode, dialog.list_, dialog.user) # debug
+    # print('from header  >>>  dialog: ', dialog.mode, dialog.list_, dialog.user) # debug
     if buttons == {}:
         await send_text(update, context, msg)
     else:
-        await send_text_buttons(update, context, msg, buttons)
+        await send_text_buttons(update, context, msg, buttons, columns=columns)
 
 
 # конвертує об'єкт user в рядок
@@ -76,7 +76,7 @@ async def send_html(
 
 # надсилає в чат текстове повідомлення та додає до нього кнопки
 async def send_text_buttons(
-    update: Update, context: ContextTypes.DEFAULT_TYPE, text: str, buttons: dict, columns: int = 2
+    update: Update, context: ContextTypes.DEFAULT_TYPE, text: str = "", buttons: dict = {}, columns: int = 2
 ) -> Message:
     text = text.encode("utf16", errors="surrogatepass").decode("utf16")
     keyboard = []
