@@ -2,23 +2,15 @@ import os
 from dotenv import load_dotenv
 
 
-# from gpt import *
-# from gpt import ChatGptService
-
-
 from util import (
     header,
-    # load_message,
-    # load_prompt,
     send_text,
-    # send_photo,
     send_text_buttons,
     dialog_user_info_to_str,
-    # show_main_menu,
     dialog,
 )
 
-from buttons import BUTTONS_MAIN, BUTTONS_MASSAGE, BUTTON_CERTIFICATE
+from buttons import BUTTONS_MAIN, BUTTONS_SERVICE, BUTTON_CERTIFICATE
 
 load_dotenv()
 TELEGRAM_ADMIN_ID = int(os.getenv("TELEGRAM_ADMIN_ID", "0"))
@@ -60,9 +52,6 @@ async def order_choice_certificate(update, context):
         context,
         "Коментар, побажання щодо сертифікату",
     )
-    # await order_case_6(update, context)
-    # dialog.user["comment"] = "хочу подарунковий сертифікат"
-    # await order_call_to_admin(update, context)
 
 
 # =======================
@@ -72,9 +61,10 @@ async def order(update, context, from_service=False):
     dialog.mode = "order"
     if not from_service:
         dialog.service = None
-    await header(update, context)
+    await header(update, context, from_service=from_service)  # show header again
 
-    await order_case_0(update, context)
+    if not from_service:
+        await order_case_0(update, context)
 
 
 # загальний обробник для замовлення масажу і замовлення сертифікату(як окремий вид масажу)
@@ -98,10 +88,13 @@ async def order(update, context, from_service=False):
 # time -> name -> phone -> (dialog.mode=="certificate") -> коментар -> завершення замовлення
 async def order_dialog(update, context):
     func = globals().get(f"order_case_{len(dialog.user)}")
+
     if func is not None:
         await func(update, context)
     else:
         print(f"order_case_{len(dialog.user)} not found")
+
+    print("order_dialog:    dialog.user: ", dialog.user)
 
 
 async def order_case_0(update, context):  # time + name
@@ -140,7 +133,6 @@ async def order_case_2(update, context):
 async def order_phone_button(update, context):
     # обробник кнопок після вводу телефону (продовжити або дзвінок)
     query = update.callback_query.data
-    # print("order_phone_button query: ", query)
     try:
         await update.callback_query.answer()
     except Exception:
@@ -158,7 +150,6 @@ async def order_phone_button(update, context):
         await order_call_to_admin(update, context)
 
     elif query == "order_phone_continue":
-        # print(">>>>>>>>>>>>>dialog.service: ", dialog.service)  # debug
         if dialog.service:
             dialog.user["massage_type"] = dialog.service
             await order_day_time(update, context)
@@ -167,9 +158,21 @@ async def order_phone_button(update, context):
                 update,
                 context,
                 "Який вид масажу ви б хотіли?",
-                BUTTONS_MASSAGE,
+                # BUTTONS_MASSAGE,
+                BUTTONS_SERVICE,
                 # columns=3,
             )
+
+
+async def order_case_3(update, context):  # massage_type + date_time
+    # вид масажу - при переході з переліку масажів ми вже знаємо вид масажу, це треба оформити
+    try:
+        dialog.user["massage_type"] = update.message.text
+    except Exception:
+        dialog.user["massage_type"] = (
+            dialog.service if dialog.service else update.message.text
+        )
+    await order_day_time(update, context)
 
 
 async def order_day_time(update, context):
@@ -181,41 +184,34 @@ async def order_day_time(update, context):
     )
 
 
-async def order_case_3(update, context):  # massage_type + date_time
-    # вид масажу - при переході з переліку масажів ми вже знаємо вид масажу, це треба оформити
-    dialog.user["massage_type"] = update.message.text
-    await order_day_time(update, context)
+# async def order_massage_button(update, context):
+#     """Handle massage selection buttons, set `massage_type` and ask for date/time."""
+#     query = update.callback_query.data
+#     try:
+#         await update.callback_query.answer()
+#     except Exception:
+#         pass
 
+#     # mapping = BUTTONS_MASSAGE
+#     mapping = BUTTONS_SERVICE
 
-async def order_massage_button(update, context):
-    """Handle massage selection buttons, set `massage_type` and ask for date/time."""
-    query = update.callback_query.data
-    try:
-        await update.callback_query.answer()
-    except Exception:
-        pass
+#     choice = mapping.get(query, None)
+#     if choice is None:
+#         await send_text(update, context, "Невідомий вибір. Спробуйте ще раз.")
+#         return
 
-    mapping = BUTTONS_MASSAGE
+#     if query == list(BUTTONS_SERVICE.keys())[-2]:  # or dialog.mode == "certificate" ???
+#         # якщо вибрали "Подарунковий сертифікат"
+#         # або ми вже в режимі "certificate"
+#         await order_choice_certificate(update, context)
 
-    choice = mapping.get(query, None)
-    if choice is None:
-        await send_text(update, context, "Невідомий вибір. Спробуйте ще раз.")
-        return
-
-    if query == list(BUTTONS_MASSAGE.keys())[-2]:  # or dialog.mode == "certificate" ???
-        # якщо вибрали "Подарунковий сертифікат"
-        # або ми вже в режимі "certificate"
-        # print("BUTTONS_MASSAGE query: ", query)
-        await order_choice_certificate(update, context)
-
-    elif query == list(BUTTONS_MASSAGE.keys())[-1]:  # якщо вибрали "Свій варіант"
-        print("BUTTONS_MASSAGE query: ", query)
-        await send_text(
-            update, context, "Вкажіть, будь ласка, свої побажання щодо масажу:"
-        )
-    else:
-        dialog.user["massage_type"] = choice
-        await order_day_time(update, context)
+#     elif query == list(BUTTONS_SERVICE.keys())[-1]:  # якщо вибрали "Свій варіант"
+#         await send_text(
+#             update, context, "Вкажіть, будь ласка, свої побажання щодо масажу:"
+#         )
+#     else:
+#         dialog.user["massage_type"] = choice
+#         await order_day_time(update, context)
 
 
 async def order_case_4(update, context):  # date_time + address
@@ -243,11 +239,10 @@ async def order_call_to_admin(update, context):
 
     # 1. надсилаємо адміну повідомлення з інформацією про замовлення
     order_info = dialog_user_info_to_str(dialog.user)
-    print("order_info: ", order_info)
     admin_message = f"📋 Нове замовлення масажу:\n\n{order_info}"
     await context.bot.send_message(chat_id=TELEGRAM_KYRYLO_ID, text=admin_message)
     # await context.bot.send_message(chat_id=TELEGRAM_ADMIN_ID, text=admin_message)
 
     # 2. надсилаємо користувачу повідомлення про успішне оформлення замовлення
     dialog.mode = "thanks"
-    await header(update, context, BUTTONS_MAIN)
+    await header(update, context, buttons=BUTTONS_MAIN)

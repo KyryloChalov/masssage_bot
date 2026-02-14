@@ -21,14 +21,14 @@ from order_util import (
     order,
     order_dialog,
     order_phone_button,
-    order_massage_button,
+    # order_massage_button,
     order_certificate,
     order_certificate_button,
 )
 from buttons import (
+    BUTTONS_HELPER,
     BUTTONS_MAIN,
     BUTTONS_ORDER_SERVICE,
-    # BUTTONS_MASSAGE,
     MODE_MAPPING,
     BUTTONS_MENU,
     BUSINESS_INFO,
@@ -37,14 +37,15 @@ from buttons import (
     BUTTONS_SERVICE,
 )
 
+MAX_HISTORY = 5  # обмежуємо історію повідомлень до останніх 10 повідомлень
+
+
 # =======================
 # Load API keys
 # =======================
 load_dotenv()
 TOKEN_TELEGRAM = os.getenv("TOKEN_TELEGRAM")
 TOKEN_GPT = os.getenv("TOKEN_GPT")
-
-MAX_HISTORY = 5  # обмежуємо історію повідомлень до останніх 10 повідомлень
 
 
 # =======================
@@ -89,11 +90,8 @@ async def handle_gpt(update, context):
 # =======================
 # Button mapping
 # =======================
-
-
 async def main_button(update, context):
     query = update.callback_query.data
-    print(">>>>>> main_button >>>>>>> query:", query)  # debug
     try:
         await update.callback_query.answer()
     except Exception:
@@ -101,7 +99,6 @@ async def main_button(update, context):
 
     mode = MODE_MAPPING.get(query)
     dialog.mode = mode
-    print("mode: ", mode)
     if mode:
         if mode == "order":
             await order(update, context)
@@ -111,6 +108,8 @@ async def main_button(update, context):
             await order_certificate(update, context)
         elif mode == "massage":
             await massage(update, context)
+        elif mode == "helper":
+            await helper(update, context)
         else:
             await set_mode(mode, update, context)
     else:
@@ -134,7 +133,6 @@ async def faq_button(update, context):
         question = FAQ_QUESTIONS.get(query)
         if question:
             answer = f"<b>{question}</b>\n=====\n{answer}"
-            # await send_html(update, context, f"<b>{question}</b>")
         await info(update, context)  # show header again
         await send_html(update, context, answer)
     else:
@@ -146,25 +144,21 @@ async def faq_button(update, context):
 # =======================
 async def massage(update, context):
     dialog.mode = "massage"
-    await header(update, context, BUTTONS_SERVICE)
+    await header(update, context, from_service=True, buttons=BUTTONS_SERVICE)
 
 
 async def services_button(update, context):
     query = update.callback_query.data
-    print('query: ', query) # debug
     try:
         await update.callback_query.answer()
     except Exception:
         pass
 
     service = BUTTONS_SERVICE.get(query)
-    print('service: ', service)
     if service:
         dialog.mode = query
         dialog.service = service
-        print('dialog.service: ', dialog.service)
-        await header(update, context, BUTTONS_ORDER_SERVICE)  # show header again
-        # await send_text(update, context, f"Інформація про послугу:\n\n{service}")
+        await header(update, context, from_service=True, buttons=BUTTONS_ORDER_SERVICE)
     else:
         await send_text(update, context, "Вибачте, інформація недоступна.")
 
@@ -177,7 +171,8 @@ async def choice_button(update, context):
         pass
 
     if query == "choice_service":
-        await order(update, context, from_service=True)
+        # await order(update, context, from_service=True)
+        await order_dialog(update, context)
     elif query == "choice_go_back":
         dialog.mode = "massage"
         await massage(update, context)
@@ -186,23 +181,8 @@ async def choice_button(update, context):
 
 
 # =======================
-# Command handlers
+# info
 # =======================
-async def start(update, context):
-    dialog.mode = "main"
-    await header(update, context, BUTTONS_MAIN)
-    await show_main_menu(update, context, BUTTONS_MENU)
-
-
-async def hello(update, context):
-    if dialog.mode in ["gpt", "main"]:
-        await handle_gpt(update, context)
-    elif dialog.mode in ["order", "certificate"]:
-        await order_dialog(update, context)
-    else:
-        await send_text(update, context, f"Привіт! \nТи написав: {update.message.text}")
-
-
 async def info(update, context):
     dialog.mode = "info"
 
@@ -214,10 +194,42 @@ async def info(update, context):
 
 
 # =======================
+# Helper
+# =======================
+async def helper(update, context):
+    dialog.mode = "helper"
+
+    await header(update, context, buttons=BUTTONS_HELPER, columns=1)
+
+
+# =======================
+# Command handlers
+# =======================
+async def start(update, context):
+    dialog.mode = "main"
+    await header(update, context, buttons=BUTTONS_MAIN)
+    await show_main_menu(update, context, BUTTONS_MENU)
+
+
+async def hello(update, context):
+    if dialog.mode in ["gpt", "main"]:
+        await handle_gpt(update, context)
+    elif dialog.mode in [
+        "order",
+        "certificate",
+        "massage",
+        "thanks",
+    ] or dialog.mode.startswith("service_"):
+        await order_dialog(update, context)
+    else:
+        await send_text(update, context, f"Привіт! \nТи написав: {update.message.text}")
+
+
+# =======================
 # Telegram bot setup
 # =======================
 if __name__ == "__main__":
-    print("bot starting... \ndialog:", dialog.mode, dialog.list_, dialog.user)
+    print("bot starting...")
 
     bot = Bot(str(TOKEN_TELEGRAM))
     chatgpt = ChatGptService(token=TOKEN_GPT)
@@ -229,14 +241,12 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("order", order))
     app.add_handler(CommandHandler("info", info))
     app.add_handler(CommandHandler("certificate", order_certificate))
+    app.add_handler(CommandHandler("massage", massage))
+    app.add_handler(CommandHandler("helper", helper))
 
     # Other modes
-    # app.add_handler(CommandHandler("info", lambda u, c: set_mode("info", u, c)))
     app.add_handler(CommandHandler("location", lambda u, c: set_mode("location", u, c)))
-    # app.add_handler(CommandHandler("place", lambda u, c: set_mode("place", u, c)))
     app.add_handler(CommandHandler("time", lambda u, c: set_mode("time", u, c)))
-    app.add_handler(CommandHandler("massage", lambda u, c: set_mode("massage", u, c)))
-    app.add_handler(CommandHandler("helper", lambda u, c: set_mode("helper", u, c)))
     app.add_handler(CommandHandler("price", lambda u, c: set_mode("price", u, c)))
 
     # Message handler
@@ -245,13 +255,14 @@ if __name__ == "__main__":
     # Callback buttons
     app.add_handler(CallbackQueryHandler(main_button, pattern="^main_.*"))
     app.add_handler(CallbackQueryHandler(order_phone_button, pattern="^order_phone_.*"))
-    app.add_handler(CallbackQueryHandler(order_massage_button, pattern="^massage_.*"))
+    # app.add_handler(CallbackQueryHandler(order_massage_button, pattern="^massage_.*"))
     app.add_handler(CallbackQueryHandler(faq_button, pattern="^faq_.*"))
     app.add_handler(CallbackQueryHandler(services_button, pattern="^service_.*"))
     app.add_handler(
         CallbackQueryHandler(order_certificate_button, pattern="^order_certificate$")
     )
     app.add_handler(CallbackQueryHandler(choice_button, pattern="^choice_.*"))
+    app.add_handler(CallbackQueryHandler(helper, pattern="^helper_.*"))
     # app.add_handler(CallbackQueryHandler(order_certificate, pattern="^order_certificate_.*"))
 
     app.run_polling()

@@ -15,17 +15,25 @@ from telegram.ext import ContextTypes
 # from deco import log_decorator
 
 # формує header: фото + текст + кнопки
-async def header(update, context, buttons: dict = {}, columns: int = 2):
+async def header(update, context, from_service=False, buttons: dict = {}, columns: int = 2):
+# async def header(update, context, buttons: dict = {}, columns: int = 2):
+
+    print('header begin:    dialog.user: ', dialog.user)
+    print('header:    from_service: ', from_service)
+    
     await send_photo(update, context, dialog.mode)
     msg = load_message(dialog.mode)
     dialog.list_.clear()
-    dialog.user.clear()
-    # print('from header  >>>  dialog: ', dialog.mode, dialog.list_, dialog.user) # debug
+    if not from_service:
+        dialog.user.clear()
+        dialog.service = ""
+    # dialog.user.clear()
     if buttons == {}:
         await send_text(update, context, msg)
     else:
         await send_text_buttons(update, context, msg, buttons, columns=columns)
 
+    print('header end:    dialog.user: ', dialog.user)
 
 # конвертує об'єкт user в рядок
 def dialog_user_info_to_str(user) -> str:
