@@ -12,34 +12,56 @@ from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
-# from deco import log_decorator
 
+class Dialog:
+    mode: str
+    service: str
+    gpt_list: list
+    history: list
+    user: dict
+
+    def __init__(self, mode="", service="", gpt_list=[], history=[], user={}):
+        self.mode = mode
+        self.service = service
+        self.gpt_list = gpt_list
+        self.history = history
+        self.user = user
+
+
+dialog = Dialog()
+
+
+# =======================
+# Допоміжні functions
+# =======================
 # формує header: фото + текст + кнопки
-async def header(update, context, from_service=False, buttons: dict = {}, columns: int = 2):
-# async def header(update, context, buttons: dict = {}, columns: int = 2):
-
-    print('header begin:    dialog.user: ', dialog.user)
-    print('header:    from_service: ', from_service)
-    
+async def header(
+    update, context, from_service=False, buttons: dict = {}, columns: int = 2
+):
     await send_photo(update, context, dialog.mode)
-    msg = load_message(dialog.mode)
-    dialog.list_.clear()
+
+    dialog.gpt_list.clear()
     if not from_service:
         dialog.user.clear()
         dialog.service = ""
-    # dialog.user.clear()
+
+    msg = load_message(dialog.mode)
     if buttons == {}:
         await send_text(update, context, msg)
     else:
         await send_text_buttons(update, context, msg, buttons, columns=columns)
 
-    print('header end:    dialog.user: ', dialog.user)
+
+async def set_mode(mode_name, update, context):
+    dialog.mode = mode_name
+    await header(update, context)
+
 
 # конвертує об'єкт user в рядок
 def dialog_user_info_to_str(user) -> str:
     result = ""
     map = {
-        "time": "Від",
+        "time": "+",
         "name": "Ім'я",
         "phone": "Номер телефону",
         "massage_type": "Вид масажу",
@@ -53,6 +75,8 @@ def dialog_user_info_to_str(user) -> str:
     return result
 
 
+
+
 # @log_decorator
 # надсилає в чат текстове повідомлення
 async def send_text(
@@ -63,9 +87,6 @@ async def send_text(
         print(message)
         return await update.effective_message.reply_text(message)
 
-    # print(update.effective_chat.first_name)
-    # print(update.effective_chat)
-    # print(update.effective_message)
     text = text.encode("utf16", errors="surrogatepass").decode("utf16")
     return await context.bot.send_message(
         chat_id=update.effective_chat.id, text=text, parse_mode=ParseMode.MARKDOWN
@@ -84,7 +105,11 @@ async def send_html(
 
 # надсилає в чат текстове повідомлення та додає до нього кнопки
 async def send_text_buttons(
-    update: Update, context: ContextTypes.DEFAULT_TYPE, text: str = "", buttons: dict = {}, columns: int = 2
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    text: str = "",
+    buttons: dict = {},
+    columns: int = 2,
 ) -> Message:
     text = text.encode("utf16", errors="surrogatepass").decode("utf16")
     keyboard = []
@@ -113,7 +138,10 @@ async def send_text_buttons(
         chat_id = update.message.chat.id
     if chat_id is not None:
         return await context.bot.send_message(
-            chat_id=chat_id, text=text, reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN
+            chat_id=chat_id,
+            text=text,
+            reply_markup=reply_markup,
+            parse_mode=ParseMode.MARKDOWN,
         )
     # last resort: raise informative error
     raise RuntimeError("No chat/message available to send buttons reply")
@@ -162,18 +190,3 @@ def load_message(name):
 def load_prompt(name):
     with open("resources/prompts/" + name + ".txt", "r", encoding="utf8") as file:
         return file.read()
-
-
-class Dialog:
-    mode: str
-    service: str
-    list_: list
-    user: dict
-
-    def __init__(self, mode="", service="", list_=[], user={}):
-        self.mode = mode
-        self.service = service
-        self.list_ = list_
-        self.user = user
-
-dialog = Dialog()

@@ -8,7 +8,6 @@
 *.sqlite3
 *.db
 *.env
-.env.*
 .DS_Store
 .idea
 .vscode
@@ -21,3 +20,4 @@ test_*.*
 *.bak
 *.tmp
 *.env copy
+*_old.*

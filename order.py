@@ -1,5 +1,5 @@
-import os
-from dotenv import load_dotenv
+# import os
+# from dotenv import load_dotenv
 
 
 from util import (
@@ -12,9 +12,9 @@ from util import (
 
 from buttons import BUTTONS_MAIN, BUTTONS_SERVICE, BUTTON_CERTIFICATE
 
-load_dotenv()
-TELEGRAM_ADMIN_ID = int(os.getenv("TELEGRAM_ADMIN_ID", "0"))
-TELEGRAM_KYRYLO_ID = int(os.getenv("TELEGRAM_KYRYLO_ID", "0"))
+from from_env import TELEGRAM_ADMIN_ID, TELEGRAM_KYRYLO_ID
+
+UNKNOWN = "-< ❓❓❓ >-"
 
 
 # =======================
@@ -45,8 +45,8 @@ async def order_certificate_button(update, context):
 async def order_choice_certificate(update, context):
     dialog.mode = "certificate"
     dialog.user["massage_type"] = "+++ сертифікат 📄✍️"
-    dialog.user["date_time"] = "--- за дзвінком"
-    dialog.user["address"] = "--- за телефоном"
+    dialog.user["date_time"] = UNKNOWN
+    dialog.user["address"] = UNKNOWN
     await send_text(
         update,
         context,
@@ -57,7 +57,7 @@ async def order_choice_certificate(update, context):
 # =======================
 # order загальний
 # =======================
-async def order(update, context, from_service=False):
+async def order_main(update, context, from_service=False):
     dialog.mode = "order"
     if not from_service:
         dialog.service = None
@@ -94,7 +94,7 @@ async def order_dialog(update, context):
     else:
         print(f"order_case_{len(dialog.user)} not found")
 
-    print("order_dialog:    dialog.user: ", dialog.user)
+    # print("order_dialog:    dialog.user: ", dialog.user)
 
 
 async def order_case_0(update, context):  # time + name
@@ -138,15 +138,17 @@ async def order_phone_button(update, context):
     except Exception:
         pass
 
+    print("dialog.service: ", dialog.service)
+
     if query == "order_phone_call":
         # Встановити фіктивні значення для решти полів і перейти до order_call_to_admin, щоб не ускладнювати діалог з користувачем, який вибрав дзвінок, додатковими питаннями
         if dialog.service:
             dialog.user["massage_type"] = dialog.service
         else:
-            dialog.user["massage_type"] = "--- визначити за телефоном"
-        dialog.user["date_time"] = "--- за дзвінком"
-        dialog.user["address"] = "--- за телефоном"
-        dialog.user["comment"] = "чекаю на дзвінок 📞📲"
+            dialog.user["massage_type"] = UNKNOWN
+        dialog.user["date_time"] = UNKNOWN
+        dialog.user["address"] = UNKNOWN
+        dialog.user["comment"] = "чекаю на дзвінок 📞->☎️"
         await order_call_to_admin(update, context)
 
     elif query == "order_phone_continue":
