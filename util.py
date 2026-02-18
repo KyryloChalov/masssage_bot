@@ -46,14 +46,16 @@ async def header(
         user_data["gpt_history"] = []
     # context.user_data["gpt_history"].clear()
     if not from_service:
-        dialog.user.clear()
-        dialog.service = ""
+        # dialog.user.clear()
+        user_data["service"] = ""
+        user_data["order"] = {}
+        # dialog.service = ""
     # dialog.gpt_list.clear()
     # if not from_service:
     #     dialog.user.clear()
     #     dialog.service = ""
 
-    # print('context.user_data["mode"]: ', context.user_data["mode"])
+    print('header >>> context.user_data: ', user_data)
     
     msg = load_message(context.user_data["mode"])
     if buttons == {}:

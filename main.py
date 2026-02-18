@@ -15,7 +15,7 @@ from util import (
     send_text,
     send_html,
     show_main_menu,
-    dialog,
+    # dialog,
 )
 from order import (
     order_main,
@@ -106,6 +106,9 @@ async def massage(update, context):
 
 
 async def services_button(update, context):
+    
+    user_data = context.user_data
+    
     query = update.callback_query.data
     try:
         await update.callback_query.answer()
@@ -115,13 +118,17 @@ async def services_button(update, context):
     service = BUTTONS_SERVICE.get(query)
     if service:
         context.user_data["mode"] = query
-        dialog.service = service
+        user_data["service"] = service
+        # dialog.service = service
         await header(update, context, from_service=True, buttons=BUTTONS_ORDER_SERVICE)
     else:
         await send_text(update, context, UNAVAILABLE)
+        # user_data["service"] = ""
 
 
 async def choice_button(update, context):
+    user_data = context.user_data
+    
     query = update.callback_query.data
     try:
         await update.callback_query.answer()
@@ -131,6 +138,7 @@ async def choice_button(update, context):
     if query == "choice_service":
         await order_dialog(update, context)
     elif query == "choice_go_back":
+        user_data["service"] = ""
         context.user_data["mode"] = "massage"
         await massage(update, context)
     else:
