@@ -21,3 +21,4 @@ test_*.*
 *.tmp
 *.env copy
 *_old.*
+*_log.json

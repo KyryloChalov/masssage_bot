@@ -15,7 +15,6 @@ from util import (
     send_text,
     send_html,
     show_main_menu,
-    # dialog,
 )
 from order import (
     order_main,
@@ -106,9 +105,9 @@ async def massage(update, context):
 
 
 async def services_button(update, context):
-    
+
     user_data = context.user_data
-    
+
     query = update.callback_query.data
     try:
         await update.callback_query.answer()
@@ -119,7 +118,6 @@ async def services_button(update, context):
     if service:
         context.user_data["mode"] = query
         user_data["service"] = service
-        # dialog.service = service
         await header(update, context, from_service=True, buttons=BUTTONS_ORDER_SERVICE)
     else:
         await send_text(update, context, UNAVAILABLE)
@@ -128,7 +126,7 @@ async def services_button(update, context):
 
 async def choice_button(update, context):
     user_data = context.user_data
-    
+
     query = update.callback_query.data
     try:
         await update.callback_query.answer()
@@ -143,19 +141,6 @@ async def choice_button(update, context):
         await massage(update, context)
     else:
         await send_text(update, context, UNAVAILABLE)
-
-
-# =======================
-# info
-# =======================
-async def info(update, context):
-    context.user_data["mode"] = "info"
-
-    # build buttons mapping: callback_data -> question text
-    buttons = {f"faq_{i}": question for i, (question, _) in enumerate(FAQ.items())}
-
-    # ask user to choose a question and show inline buttons
-    await header(update, context, buttons=buttons, columns=1)
 
 
 # # =======================
@@ -180,7 +165,18 @@ async def info(update, context):
 async def start(update, context):
     context.user_data["mode"] = "main"
     await header(update, context, buttons=BUTTONS_MAIN)
+
     await show_main_menu(update, context, BUTTONS_MENU)
+
+
+async def info(update, context):  # Найчастіші запитання
+    context.user_data["mode"] = "info"
+
+    # build buttons mapping: callback_data -> question text
+    buttons = {f"faq_{i}": question for i, (question, _) in enumerate(FAQ.items())}
+
+    # ask user to choose a question and show inline buttons
+    await header(update, context, buttons=buttons, columns=1)
 
 
 async def hello(update, context):
@@ -190,7 +186,6 @@ async def hello(update, context):
         "order",
         "certificate",
         "massage",
-        "thanks",
     ] or context.user_data["mode"].startswith("service_"):
         await order_dialog(update, context)
     else:

@@ -29,17 +29,6 @@ BUTTONS_MENU = {
     "gpt": "Задати питання чату GPT 🧠",
 }
 
-# BUTTONS_MASSAGE = {
-#     "massage_1": "Масаж загальний",
-#     "massage_2": "Масаж спини",
-#     "massage_3": "Масаж ног",
-#     "massage_4": "Масаж офісний",
-#     "massage_5": "Масаж антицелюлітний",
-#     "massage_6": "Масаж тайський",
-#     "massage_certificate": "Подарунковий сертифікат",
-#     "massage_custom": "Свій варіант 🙌",
-# }
-
 
 BUTTONS_HELPER = {
     # "helper_1": "Є направлення від лікаря?",

@@ -1,5 +1,4 @@
 from telegram import (
-    # Chat,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
     Message,
@@ -13,24 +12,6 @@ from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
 
-class Dialog:
-    # mode: str
-    service: str
-    # gpt_list: list
-    # history: list
-    user: dict
-
-    def __init__(self, mode="", service="", gpt_list=[], history=[], user={}):
-        # self.mode = mode
-        self.service = service
-        # self.gpt_list = gpt_list
-        # self.history = history
-        self.user = user
-
-
-dialog = Dialog()
-
-
 # =======================
 # Допоміжні functions
 # =======================
@@ -38,25 +19,18 @@ dialog = Dialog()
 async def header(
     update, context, from_service=False, buttons: dict = {}, columns: int = 2
 ):
-    await send_photo(update, context, context.user_data["mode"])
-    
     user_data = context.user_data
+    
+    await send_photo(update, context, user_data["mode"])
 
     if "gpt_history" not in user_data:
         user_data["gpt_history"] = []
-    # context.user_data["gpt_history"].clear()
     if not from_service:
-        # dialog.user.clear()
         user_data["service"] = ""
         user_data["order"] = {}
-        # dialog.service = ""
-    # dialog.gpt_list.clear()
-    # if not from_service:
-    #     dialog.user.clear()
-    #     dialog.service = ""
 
-    print('header >>> context.user_data: ', user_data)
-    
+    # print("header >>> context.user_data: ", user_data) # debug
+
     msg = load_message(context.user_data["mode"])
     if buttons == {}:
         await send_text(update, context, msg)
@@ -66,7 +40,6 @@ async def header(
 
 async def set_mode(mode_name, update, context):
     context.user_data["mode"] = mode_name
-    # print('mode_name: ', mode_name)
     await header(update, context)
 
 
@@ -88,9 +61,6 @@ def dialog_user_info_to_str(user) -> str:
     return result
 
 
-
-
-# @log_decorator
 # надсилає в чат текстове повідомлення
 async def send_text(
     update: Update, context: ContextTypes.DEFAULT_TYPE, text: str

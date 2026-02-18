@@ -1,0 +1,10 @@
+.env
+__pycache__
+*.pyc
+orders_log.json
+*_old.py
+*_test.py
+demo_*.py
+*.psd
+*.zip
+*.json
