@@ -14,17 +14,17 @@ from telegram.ext import ContextTypes
 
 
 class Dialog:
-    mode: str
+    # mode: str
     service: str
-    gpt_list: list
-    history: list
+    # gpt_list: list
+    # history: list
     user: dict
 
     def __init__(self, mode="", service="", gpt_list=[], history=[], user={}):
-        self.mode = mode
+        # self.mode = mode
         self.service = service
-        self.gpt_list = gpt_list
-        self.history = history
+        # self.gpt_list = gpt_list
+        # self.history = history
         self.user = user
 
 
@@ -38,14 +38,24 @@ dialog = Dialog()
 async def header(
     update, context, from_service=False, buttons: dict = {}, columns: int = 2
 ):
-    await send_photo(update, context, dialog.mode)
+    await send_photo(update, context, context.user_data["mode"])
+    
+    user_data = context.user_data
 
-    dialog.gpt_list.clear()
+    if "gpt_history" not in user_data:
+        user_data["gpt_history"] = []
+    # context.user_data["gpt_history"].clear()
     if not from_service:
         dialog.user.clear()
         dialog.service = ""
+    # dialog.gpt_list.clear()
+    # if not from_service:
+    #     dialog.user.clear()
+    #     dialog.service = ""
 
-    msg = load_message(dialog.mode)
+    # print('context.user_data["mode"]: ', context.user_data["mode"])
+    
+    msg = load_message(context.user_data["mode"])
     if buttons == {}:
         await send_text(update, context, msg)
     else:
@@ -53,7 +63,8 @@ async def header(
 
 
 async def set_mode(mode_name, update, context):
-    dialog.mode = mode_name
+    context.user_data["mode"] = mode_name
+    # print('mode_name: ', mode_name)
     await header(update, context)
 
 

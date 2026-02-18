@@ -1,12 +1,11 @@
 BUTTONS_MAIN = {
-    "main_types": "Види масажу",
+    "main_massage": "Види масажу",
     "main_order": "Замовити масаж",
     # "main_helper": "Допомога у виборі масажу",
     "main_price": "Ціна на послуги",
     "main_certificate": "Подарункові сертифікати",
     "main_location": "Де ми працюємо",
-    "main_info": "Питання та відповіді",
-    # "main_info": "Інформація про Home.Masssage",
+    "main_info": "Найчастіші запитання",
 }
 
 MODE_MAPPING = {
@@ -16,7 +15,7 @@ MODE_MAPPING = {
     "main_location": "location",
     "main_info": "info",
     "main_order": "order",
-    "main_types": "massage",
+    "main_massage": "massage",
     "main_certificate": "certificate",
 }
 
@@ -26,8 +25,8 @@ BUTTONS_MENU = {
     # "helper": "Допомога у виборі масажу",
     # "price": "Ціна на послуги",
     # "location": "Де ми працюємо",
-    "info": "Питання та відповіді",
-    "gpt": "задати питання чату GPT 🧠",
+    "info": "Найчастіші запитання",
+    "gpt": "Задати питання чату GPT 🧠",
 }
 
 # BUTTONS_MASSAGE = {

@@ -21,7 +21,7 @@ UNKNOWN = "-< ❓❓❓ >-"
 # certificate order
 # =======================
 async def order_certificate(update, context):
-    dialog.mode = "certificate"
+    context.user_data["mode"] = "certificate"
     await header(
         update,
         context,
@@ -43,7 +43,7 @@ async def order_certificate_button(update, context):
 
 
 async def order_choice_certificate(update, context):
-    dialog.mode = "certificate"
+    context.user_data["mode"] = "certificate"
     dialog.user["massage_type"] = "+++ сертифікат 📄✍️"
     dialog.user["date_time"] = UNKNOWN
     dialog.user["address"] = UNKNOWN
@@ -58,7 +58,7 @@ async def order_choice_certificate(update, context):
 # order загальний
 # =======================
 async def order_main(update, context, from_service=False):
-    dialog.mode = "order"
+    context.user_data["mode"] = "order"
     if not from_service:
         dialog.service = None
     await header(update, context, from_service=from_service)  # show header again
@@ -85,7 +85,7 @@ async def order_main(update, context, from_service=False):
 # і він визначає, який саме крок виконувати, в залежності від того, яка інформація вже зібрана в dialog.user.
 # time -> name -> phone -> (дзвінок або <продовжити>) -> вид масажу -> день і час -> адреса -> коментар -> завершення замовлення
 # time -> name -> phone -> (<дзвінок> або продовжити) -> завершення замовлення
-# time -> name -> phone -> (dialog.mode=="certificate") -> коментар -> завершення замовлення
+# time -> name -> phone -> (context.user_data["mode"]=="certificate") -> коментар -> завершення замовлення
 async def order_dialog(update, context):
     func = globals().get(f"order_case_{len(dialog.user)}")
 
@@ -94,7 +94,7 @@ async def order_dialog(update, context):
     else:
         print(f"order_case_{len(dialog.user)} not found")
 
-    # print("order_dialog:    dialog.user: ", dialog.user)
+    print("order_dialog:    dialog.user: ", dialog.user)
 
 
 async def order_case_0(update, context):  # time + name
@@ -115,7 +115,7 @@ async def order_case_2(update, context):
     # phone + buttons (продовжити або дзвінок)
     dialog.user["phone"] = update.message.text
 
-    if dialog.mode == "certificate" or dialog.service == "Подарунковий сертифікат":
+    if context.user_data["mode"] == "certificate" or dialog.service == "Подарунковий сертифікат":
         await order_choice_certificate(update, context)
     else:
         await send_text_buttons(
@@ -202,7 +202,7 @@ async def order_day_time(update, context):
 #         await send_text(update, context, "Невідомий вибір. Спробуйте ще раз.")
 #         return
 
-#     if query == list(BUTTONS_SERVICE.keys())[-2]:  # or dialog.mode == "certificate" ???
+#     if query == list(BUTTONS_SERVICE.keys())[-2]:  # or context.user_data["mode"] == "certificate" ???
 #         # якщо вибрали "Подарунковий сертифікат"
 #         # або ми вже в режимі "certificate"
 #         await order_choice_certificate(update, context)
@@ -246,5 +246,5 @@ async def order_call_to_admin(update, context):
     # await context.bot.send_message(chat_id=TELEGRAM_ADMIN_ID, text=admin_message)
 
     # 2. надсилаємо користувачу повідомлення про успішне оформлення замовлення
-    dialog.mode = "thanks"
+    context.user_data["mode"] = "thanks"
     await header(update, context, buttons=BUTTONS_MAIN)

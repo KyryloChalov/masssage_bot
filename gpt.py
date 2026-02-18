@@ -1,6 +1,7 @@
 from openai import OpenAI, RateLimitError
 
-from util import send_text, dialog
+from util import send_text
+# from util import send_text, dialog, send_photo
 from sys_prompt import BUSINESS_INFO, SYSTEM_PROMPT
 from from_env import TOKEN_GPT, TELEGRAM_KYRYLO_ID, TELEGRAM_ADMIN_ID, ADMIN_CHAT_IDS
 from datetime import datetime
@@ -20,6 +21,7 @@ from phonenumbers import (
 
 MAX_HISTORY = 10  # обмежуємо історію повідомлень до останніх 10 повідомлень
 ORDER_COOLDOWN = 300  # 5 хвилин
+CONFIRM_MESSAGE = "Дякую! Передаю інформацію менеджеру.\n\n>>> Очікуйте на дзвінок 📞"
 last_orders = {}
 
 
@@ -76,19 +78,114 @@ chatgpt = ChatGptService(token=TOKEN_GPT)
 
 # =======================
 # gpt functions
-# =======================
+# # =======================
+# async def handle_gpt(update, context):
+#     if dialog.mode != "main":
+#         await send_photo(update, context, "gpt")
+#     dialog.mode = "gpt"
+#     user = update.effective_user
+#     user_text = update.message.text.strip()
+
+#     dialog.history.append(user_text)  # повна історія діалогу - додаємо питання юзера
+
+#     # зберігаємо та обмежуємо історію юзера
+#     dialog.gpt_list.append(user_text)
+#     dialog.gpt_list = dialog.gpt_list[-MAX_HISTORY:]
+#     print("dialog.gpt_list: ", dialog.gpt_list)  # debug
+#     user_history = "\n\n".join(dialog.gpt_list)
+
+#     input_text = f"""
+# ІНФОРМАЦІЯ ПРО СЕРВІС:{BUSINESS_INFO}
+# ІСТОРІЯ ПИТАНЬ КЛІЄНТА:{user_history}
+# ПИТАННЯ КЛІЄНТА:{user_text}
+# """
+
+#     try:
+#         my_message = await send_text(update, context, " . . . ")
+
+#         phone = extract_phone(user_text)
+
+#         if phone:
+#             full_history = "\n- ".join(dialog.history)
+#             print("full_history: ", full_history)  # debug
+
+#             order_data = {
+#                 "name": user.full_name,
+#                 "username": user.username,
+#                 "user_id": user.id,
+#                 "phone": phone,
+#                 "dialog": full_history,
+#             }
+
+#             now = time.time()
+#             user_id = user.id
+
+#             if user_id in last_orders:
+#                 if now - last_orders[user_id] < ORDER_COOLDOWN:
+#                     await my_message.edit_text(
+#                         "Ваше замовлення вже передано менеджеру 🙌\nОчікуйте дзвінка."
+#                     )
+#                     return
+
+#             last_orders[user_id] = now
+
+#             save_order_to_file(order_data)
+#             await notify_admin(context, order_data)
+
+#             await my_message.edit_text(
+#                 "Дякую! Передаю інформацію менеджеру.\n\nОчікуйте на дзвінок 📞"
+#             )
+
+#             # очищаємо діалог щоб не тригерити повторно
+#             dialog.gpt_list = []
+#             dialog.history = []
+#             dialog.mode = "main"
+#             return
+
+#         # якщо це не замовлення → працюємо через GPT
+#         answer = await chatgpt.send_question(SYSTEM_PROMPT, input_text, max_tokens=300)
+
+#         dialog.history.append(
+#             "<<H.M>> " + answer
+#         )  # повна історія діалогу - додаємо Відповідь системи
+
+#         await my_message.edit_text(answer)
+
+#     except RateLimitError:
+#         await send_text(
+#             update,
+#             context,
+#             "Зараз надто багато запитів. Спробуйте через кілька секунд.",
+#         )
+#     except Exception as e:
+#         await send_text(update, context, f"Виникла помилка: {e}")
+
+
 async def handle_gpt(update, context):
-    dialog.mode = "gpt"
+    # if dialog.mode != "main":
+    # await send_photo(update, context, "gpt")
+    # dialog.mode = "gpt"
     user = update.effective_user
     user_text = update.message.text.strip()
 
-    dialog.history.append(user_text)  # повна історія діалогу - додаємо питання юзера
+    user_data = context.user_data
+    if "gpt_history" not in user_data:
+        user_data["gpt_history"] = []
+    user_data["mode"] = "gpt"
+    user_data["gpt_history"].append(user_text)
+    # dialog.gpt_list.append(user_text)
+    if "full_history" not in user_data:
+        user_data["full_history"] = []
+    user_data["full_history"].append(user_text)
+    # dialog.history.append(user_text)  # повна історія діалогу - додаємо питання юзера
+
+    print("user_data: ", user_data)  # debug
 
     # зберігаємо та обмежуємо історію юзера
-    dialog.gpt_list.append(user_text)
-    dialog.gpt_list = dialog.gpt_list[-MAX_HISTORY:]
-    print("dialog.gpt_list: ", dialog.gpt_list)  # debug
-    user_history = "\n\n".join(dialog.gpt_list)
+    user_data["gpt_history"] = user_data["gpt_history"][-MAX_HISTORY:]
+    # dialog.gpt_list = dialog.gpt_list[-MAX_HISTORY:]
+    user_history = "\n\n".join(user_data["gpt_history"])
+    # user_history = "\n\n".join(dialog.gpt_list)
 
     input_text = f"""
 ІНФОРМАЦІЯ ПРО СЕРВІС:{BUSINESS_INFO}
@@ -102,8 +199,13 @@ async def handle_gpt(update, context):
         phone = extract_phone(user_text)
 
         if phone:
-            full_history = "\n- ".join(dialog.history)
-            print("full_history: ", full_history)  # debug
+            now = time.time()
+            user_id = user.id
+
+            full_history = "\n- ".join(user_data["full_history"])
+            full_history = full_history + CONFIRM_MESSAGE
+            # full_history = "\n- ".join(dialog.history)
+            # print("full_history: ", full_history)  # debug
 
             order_data = {
                 "name": user.full_name,
@@ -111,10 +213,8 @@ async def handle_gpt(update, context):
                 "user_id": user.id,
                 "phone": phone,
                 "dialog": full_history,
+                # "dialog": user_history,
             }
-
-            now = time.time()
-            user_id = user.id
 
             if user_id in last_orders:
                 if now - last_orders[user_id] < ORDER_COOLDOWN:
@@ -128,22 +228,25 @@ async def handle_gpt(update, context):
             save_order_to_file(order_data)
             await notify_admin(context, order_data)
 
-            await my_message.edit_text(
-                "Дякую! Передаю інформацію менеджеру.\n\nОчікуйте на дзвінок 📞"
-            )
+            await my_message.edit_text(CONFIRM_MESSAGE)
 
             # очищаємо діалог щоб не тригерити повторно
-            dialog.gpt_list = []
-            dialog.history = []
-            dialog.mode = "main"
+            user_data["gpt_history"] = []
+            user_data["mode"] = "main"
+            # dialog.gpt_list = []
+            # dialog.history = []
+            # dialog.mode = "main"
             return
 
         # якщо це не замовлення → працюємо через GPT
+        # ---------- GPT RESPONSE ----------
         answer = await chatgpt.send_question(SYSTEM_PROMPT, input_text, max_tokens=300)
 
-        dialog.history.append(
-            "<<H.M>> " + answer
-        )  # повна історія діалогу - додаємо Відповідь системи
+        user_data["full_history"].append("<<H.M>> " + answer)
+        # user_data["full_history"].append(answer)
+        # dialog.history.append(
+        #     "<<H.M>> " + answer
+        # )  # повна історія діалогу - додаємо Відповідь системи
 
         await my_message.edit_text(answer)
 
@@ -162,7 +265,6 @@ def extract_phone(text: str, region="UA"):
     Повертає номер у форматі +380XXXXXXXXX
     або None якщо номер невалідний
     """
-
     try:
         for match in PhoneNumberMatcher(text, region):
             number = match.number

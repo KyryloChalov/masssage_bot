@@ -56,7 +56,7 @@ async def main_button(update, context):
         pass
 
     mode = MODE_MAPPING.get(query)
-    dialog.mode = mode
+    context.user_data["mode"] = mode
     if mode:
         if mode == "order":
             await order_main(update, context)
@@ -101,7 +101,7 @@ async def faq_button(update, context):
 # Massage selection
 # =======================
 async def massage(update, context):
-    dialog.mode = "massage"
+    context.user_data["mode"] = "massage"
     await header(update, context, from_service=True, buttons=BUTTONS_SERVICE)
 
 
@@ -114,7 +114,7 @@ async def services_button(update, context):
 
     service = BUTTONS_SERVICE.get(query)
     if service:
-        dialog.mode = query
+        context.user_data["mode"] = query
         dialog.service = service
         await header(update, context, from_service=True, buttons=BUTTONS_ORDER_SERVICE)
     else:
@@ -131,7 +131,7 @@ async def choice_button(update, context):
     if query == "choice_service":
         await order_dialog(update, context)
     elif query == "choice_go_back":
-        dialog.mode = "massage"
+        context.user_data["mode"] = "massage"
         await massage(update, context)
     else:
         await send_text(update, context, UNAVAILABLE)
@@ -141,7 +141,7 @@ async def choice_button(update, context):
 # info
 # =======================
 async def info(update, context):
-    dialog.mode = "info"
+    context.user_data["mode"] = "info"
 
     # build buttons mapping: callback_data -> question text
     buttons = {f"faq_{i}": question for i, (question, _) in enumerate(FAQ.items())}
@@ -154,13 +154,13 @@ async def info(update, context):
 # # Helper
 # # =======================
 # async def helper(update, context):
-#     dialog.mode = "helper"
+#     context.user_data["mode"] = "helper"
 
 #     await header(update, context, buttons=BUTTONS_HELPER, columns=1)
 
 
 # async def helper_2(update, context):
-#     dialog.mode = "helper"
+#     context.user_data["mode"] = "helper"
 
 #     await header(update, context, buttons=BUTTONS_HELPER, columns=1)
 # # TODO зразок на сайті https://home.masssage.kyiv.ua/services/assistant.php?lang=ua
@@ -170,20 +170,20 @@ async def info(update, context):
 # Command handlers
 # =======================
 async def start(update, context):
-    dialog.mode = "main"
+    context.user_data["mode"] = "main"
     await header(update, context, buttons=BUTTONS_MAIN)
     await show_main_menu(update, context, BUTTONS_MENU)
 
 
 async def hello(update, context):
-    if dialog.mode in ["gpt", "main"]:
+    if context.user_data["mode"] in ["gpt", "main"]:
         await handle_gpt(update, context)
-    elif dialog.mode in [
+    elif context.user_data["mode"] in [
         "order",
         "certificate",
         "massage",
         "thanks",
-    ] or dialog.mode.startswith("service_"):
+    ] or context.user_data["mode"].startswith("service_"):
         await order_dialog(update, context)
     else:
         await send_text(update, context, f"Вітаю! \nТи написав: {update.message.text}")
