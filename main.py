@@ -15,6 +15,8 @@ from util import (
     send_text,
     send_html,
     show_main_menu,
+    init_user_date,
+    log_decorator
 )
 from order import (
     order_main,
@@ -30,7 +32,9 @@ from buttons import (
     BUTTONS_ORDER_SERVICE,
     MODE_MAPPING,
     BUTTONS_MENU,
-    FAQ,
+    # FAQ,
+    FAQ_ANSWERS,
+    FAQ_QUESTIONS,
     BUTTONS_SERVICE,
 )
 
@@ -73,9 +77,15 @@ async def main_button(update, context):
         await handle_gpt(update, context)
 
 
-# mapping from callback_data -> answer text for FAQ buttons
-FAQ_ANSWERS = {f"faq_{i}": value for i, (key, value) in enumerate(FAQ.items())}
-FAQ_QUESTIONS = {f"faq_{i}": key for i, (key, value) in enumerate(FAQ.items())}
+# =======================
+# Info (FAQ) - найчастіші запитання ++
+# =======================
+#  TODO почистити тексти відповідей - там багато рудиментів, що залишилися від сайту
+async def info(update, context):  # Найчастіші запитання
+    context.user_data["mode"] = "info"
+
+    # ask user to choose a question and show inline buttons
+    await header(update, context, buttons=FAQ_QUESTIONS, columns=1)
 
 
 async def faq_button(update, context):
@@ -89,9 +99,9 @@ async def faq_button(update, context):
     if answer:
         question = FAQ_QUESTIONS.get(query)
         if question:
-            answer = f"<b>{question}</b>\n=====\n{answer}"
+            answer = f"*{question}*\n=====\n{answer}"
         await info(update, context)  # show header again
-        await send_html(update, context, answer)
+        await send_text(update, context, answer)
     else:
         await send_text(update, context, UNAVAILABLE)
 
@@ -105,8 +115,8 @@ async def massage(update, context):
 
 
 async def services_button(update, context):
-
     user_data = context.user_data
+    print("services_button 1 >>> user_data: ", user_data)
 
     query = update.callback_query.data
     try:
@@ -116,12 +126,14 @@ async def services_button(update, context):
 
     service = BUTTONS_SERVICE.get(query)
     if service:
-        context.user_data["mode"] = query
+        user_data["mode"] = query
         user_data["service"] = service
         await header(update, context, from_service=True, buttons=BUTTONS_ORDER_SERVICE)
     else:
         await send_text(update, context, UNAVAILABLE)
         # user_data["service"] = ""
+
+    print("services_button 2 >>> user_data: ", user_data)
 
 
 async def choice_button(update, context):
@@ -137,7 +149,7 @@ async def choice_button(update, context):
         await order_dialog(update, context)
     elif query == "choice_go_back":
         user_data["service"] = ""
-        context.user_data["mode"] = "massage"
+        user_data["mode"] = "massage"
         await massage(update, context)
     else:
         await send_text(update, context, UNAVAILABLE)
@@ -162,31 +174,29 @@ async def choice_button(update, context):
 # =======================
 # Command handlers
 # =======================
+@log_decorator
 async def start(update, context):
+    await init_user_date(update, context)
     context.user_data["mode"] = "main"
     await header(update, context, buttons=BUTTONS_MAIN)
 
     await show_main_menu(update, context, BUTTONS_MENU)
 
 
-async def info(update, context):  # Найчастіші запитання
-    context.user_data["mode"] = "info"
-
-    # build buttons mapping: callback_data -> question text
-    buttons = {f"faq_{i}": question for i, (question, _) in enumerate(FAQ.items())}
-
-    # ask user to choose a question and show inline buttons
-    await header(update, context, buttons=buttons, columns=1)
-
-
+@log_decorator
 async def hello(update, context):
-    if context.user_data["mode"] in ["gpt", "main"]:
+    user_data = context.user_data
+
+    print('hello >>> user_data["mode"]: ', user_data["mode"])
+    if user_data["mode"] in ["gpt", "main"]:
         await handle_gpt(update, context)
-    elif context.user_data["mode"] in [
+    elif user_data["mode"] in [
         "order",
         "certificate",
         "massage",
-    ] or context.user_data["mode"].startswith("service_"):
+    ] or user_data[
+        "mode"
+    ].startswith("service_"):
         await order_dialog(update, context)
     else:
         await send_text(update, context, f"Вітаю! \nТи написав: {update.message.text}")
@@ -196,7 +206,7 @@ async def hello(update, context):
 # Telegram bot setup
 # =======================
 if __name__ == "__main__":
-    print("bot starting...")
+    print("🤖 bot starting...")
 
     bot = Bot(str(TOKEN_TELEGRAM))
     app = ApplicationBuilder().token(str(TOKEN_TELEGRAM)).build()

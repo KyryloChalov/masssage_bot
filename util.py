@@ -11,16 +11,60 @@ from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
+# import phonenumbers
+from phonenumbers import (
+    NumberParseException,
+    PhoneNumberMatcher,
+    PhoneNumberFormat,
+    is_valid_number,
+    format_number,
+)
+import re
+
+from pprint import pprint
+
+from colors import RED, RESET, YELLOW, LIGHTBLUE
+
 
 # =======================
 # Допоміжні functions
 # =======================
+# декоратор щоб побачити user_data на початку та після виконання функції
+def log_decorator(func):
+    def wrapper(update, context, *args, **kwargs):
+        # print(f"func {func.__name__} args {args} kwargs {kwargs}")
+        print(f"{LIGHTBLUE}<<< {YELLOW}{func.__name__} {LIGHTBLUE}>>> {RESET}")
+        # print(f"\t begin: {context}")
+        print(f"\t begin: {context.user_data}")
+        print(f"\t  args: {args}")
+        # print(f"\tkwargs: {kwargs}")
+
+        result = func(update, context, *args, **kwargs)
+
+        print(f"\t   end: {context.user_data}")
+        # print(f"        update: {update}")
+        return result
+
+    return wrapper
+
+@log_decorator
+async def init_user_date(update, context):
+    user_data = context.user_data
+    user_data["service"] = ""
+    user_data["mode"] = ""
+    user_data["order"] = {}
+    user_data["gpt_history"] = []
+    user_data["full_history"] = []
+
+
 # формує header: фото + текст + кнопки
+# TODO зробити single response
+@log_decorator
 async def header(
     update, context, from_service=False, buttons: dict = {}, columns: int = 2
 ):
     user_data = context.user_data
-    
+
     await send_photo(update, context, user_data["mode"])
 
     if "gpt_history" not in user_data:
@@ -59,6 +103,51 @@ def dialog_user_info_to_str(user) -> str:
         if key in user:
             result += name + ": " + user[key] + "\n"
     return result
+
+
+def extract_phone(text: str, region="UA"):
+    """
+    Повертає номер у форматі +380XXXXXXXXX
+    або None якщо номер невалідний
+    """
+    try:
+        for match in PhoneNumberMatcher(text, region):
+            number = match.number
+
+            # перевірка валідності
+            if is_valid_number(number):
+                # повертаємо у міжнародному форматі
+                return format_number(number, PhoneNumberFormat.E164)
+
+    except NumberParseException:
+        return None
+
+    return None
+
+
+def normalize_phone(phone_raw: str) -> str:
+
+    # патерн українського телефону
+    # phone_pattern = r"(\+?38)?[\s\-()]*0\d{2}[\s\-()]*\d{3}[\s\-()]*\d{2}[\s\-()]*\d{2}"
+    # phone_match = re.search(phone_pattern, user_text)
+
+    # # якщо телефон знайдено → це замовлення
+    # if phone_match:
+    #     raw_phone = phone_match.group()
+    #     phone = normalize_phone(raw_phone)
+    # ===========================================================
+    # залишаємо тільки цифри
+    digits = re.sub(r"\D", "", phone_raw)
+
+    # якщо номер починається з 0 → додаємо 38
+    if digits.startswith("0"):
+        digits = "38" + digits
+
+    # якщо починається з 380 → ок
+    if digits.startswith("380"):
+        return "+" + digits
+
+    return None
 
 
 # надсилає в чат текстове повідомлення

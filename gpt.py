@@ -1,29 +1,18 @@
 from openai import OpenAI, RateLimitError
 
-from util import send_text
-
-from util import send_text, send_photo
+from util import send_text, send_photo, extract_phone
 from sys_prompt import BUSINESS_INFO, SYSTEM_PROMPT
 from from_env import TOKEN_GPT, TELEGRAM_KYRYLO_ID, TELEGRAM_ADMIN_ID, ADMIN_CHAT_IDS
 from datetime import datetime
 
 import json
-import re
 import time
 
-# import phonenumbers
-from phonenumbers import (
-    NumberParseException,
-    PhoneNumberMatcher,
-    PhoneNumberFormat,
-    is_valid_number,
-    format_number,
-)
 
 MAX_HISTORY = 10  # обмежуємо історію повідомлень до останніх 10 повідомлень
 ORDER_COOLDOWN = 300  # 5 хвилин
 CONFIRM_MESSAGE = "Дякую! Передаю інформацію менеджеру.\n\n>>> Очікуйте на дзвінок 📞"
-last_orders = {}
+last_orders: dict[str, str] = {}
 
 
 class ChatGptService:
@@ -142,7 +131,9 @@ async def handle_gpt(update, context):
             save_order_to_file(order_data)
             await notify_admin(context, order_data)
 
+            # header? 
             await my_message.edit_text(CONFIRM_MESSAGE)
+            await send_photo(update, context, "thanks")
 
             # очищаємо діалог щоб не тригерити повторно
             user_data["gpt_history"] = []
@@ -168,51 +159,6 @@ async def handle_gpt(update, context):
         )
     except Exception as e:
         await send_text(update, context, f"Виникла помилка: {e}")
-
-
-def extract_phone(text: str, region="UA"):
-    """
-    Повертає номер у форматі +380XXXXXXXXX
-    або None якщо номер невалідний
-    """
-    try:
-        for match in PhoneNumberMatcher(text, region):
-            number = match.number
-
-            # перевірка валідності
-            if is_valid_number(number):
-                # повертаємо у міжнародному форматі
-                return format_number(number, PhoneNumberFormat.E164)
-
-    except NumberParseException:
-        return None
-
-    return None
-
-
-def normalize_phone(phone_raw: str) -> str:
-
-    # патерн українського телефону
-    # phone_pattern = r"(\+?38)?[\s\-()]*0\d{2}[\s\-()]*\d{3}[\s\-()]*\d{2}[\s\-()]*\d{2}"
-    # phone_match = re.search(phone_pattern, user_text)
-
-    # # якщо телефон знайдено → це замовлення
-    # if phone_match:
-    #     raw_phone = phone_match.group()
-    #     phone = normalize_phone(raw_phone)
-    # ===========================================================
-    # залишаємо тільки цифри
-    digits = re.sub(r"\D", "", phone_raw)
-
-    # якщо номер починається з 0 → додаємо 38
-    if digits.startswith("0"):
-        digits = "38" + digits
-
-    # якщо починається з 380 → ок
-    if digits.startswith("380"):
-        return "+" + digits
-
-    return None
 
 
 async def notify_admin(context, order_data):

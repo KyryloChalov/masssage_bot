@@ -3,11 +3,15 @@ from util import (
     send_text,
     send_text_buttons,
     dialog_user_info_to_str,
+    log_decorator,
 )
 
 from buttons import BUTTONS_MAIN, BUTTONS_SERVICE, BUTTON_CERTIFICATE
 
 from from_env import TELEGRAM_ADMIN_ID, TELEGRAM_KYRYLO_ID
+
+from pprint import pprint
+
 
 UNKNOWN = "-< ❓❓❓ >-"
 
@@ -15,19 +19,23 @@ UNKNOWN = "-< ❓❓❓ >-"
 # =======================
 # certificate order
 # =======================
+@log_decorator
 async def order_certificate(update, context):
     user_data = context.user_data
 
     if "order" not in user_data:
         user_data["order"] = {}
 
-    context.user_data["mode"] = "certificate"
+    print("order_certificate 1 >>> user_data: ", user_data)
+    user_data["service"] = BUTTONS_SERVICE["service_certificate"]
+    print("order_certificate 2 >>> user_data: ", user_data)
     await header(
         update,
         context,
         buttons=BUTTON_CERTIFICATE,
         columns=1,
     )
+    print("order_certificate 3 >>> user_data: ", user_data)
 
 
 async def order_certificate_button(update, context):
@@ -97,8 +105,10 @@ async def order_main(update, context, from_service=False):
 # time -> name -> phone -> (context.user_data["mode"]=="certificate") -> коментар -> завершення замовлення
 async def order_dialog(update, context):
     user_data = context.user_data
+
     if "order" not in user_data:
         user_data["order"] = {}
+
     func = globals().get(f"order_case_{len(user_data["order"])}")
 
     if func is not None:
@@ -113,6 +123,7 @@ async def order_case_0(update, context):  # time + name
     from datetime import datetime
 
     user_data = context.user_data
+
     user_data["order"]["time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     await send_text(update, context, "Як до вас звертатися? \ud83d\ude4c")
 
@@ -126,11 +137,15 @@ async def order_case_1(update, context):  # name + phone
 
 async def order_case_2(update, context):
     user_data = context.user_data
+    print("order_case_2 >>> user_data: ", user_data)
 
     # phone + buttons (продовжити або дзвінок)
     user_data["order"]["phone"] = update.message.text
 
-    if user_data["mode"] in ["certificate", "service_certificate"]:
+    # if user_data["mode"] in ["certificate", "service_certificate"]:
+    if user_data["service"] in [
+        "Подарунковий сертифікат",
+    ]:
         await order_choice_certificate(update, context)
     else:
         await send_text_buttons(
@@ -181,8 +196,12 @@ async def order_phone_button(update, context):
 async def order_case_3(update, context):  # massage_type + date_time
     # вид масажу - при переході з переліку масажів ми вже знаємо вид масажу, це треба оформити
     user_data = context.user_data
+    print("order_case_3 >>> user_data: ", user_data)
 
-    if user_data["mode"] in ["certificate", "service_certificate"]:
+    # if user_data["mode"] in ["certificate", "service_certificate"]:
+    if user_data["service"] in [
+        "Подарунковий сертифікат",
+    ]:
         await order_choice_certificate(update, context)
 
     else:
