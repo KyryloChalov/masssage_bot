@@ -1,267 +1,174 @@
-from util import (
-    header,
-    send_text,
-    send_text_buttons,
-    dialog_user_info_to_str,
-    log_decorator,
+# order.py
+
+import re
+from telegram import Update
+from telegram.ext import (
+    ContextTypes,
+    ConversationHandler,
+    CommandHandler,
+    MessageHandler,
+    filters,
 )
 
-from buttons import BUTTONS_MAIN, BUTTONS_SERVICE, BUTTON_CERTIFICATE
-
-from from_env import TELEGRAM_ADMIN_ID, TELEGRAM_KYRYLO_ID
-
-from pprint import pprint
+# ---- STATES ----
+ASK_PHONE, ASK_TIME, CONFIRM = range(3)
 
 
-UNKNOWN = "-< ❓❓❓ >-"
+# -----------------------------
+# 📌 PHONE NORMALIZATION
+# -----------------------------
+def normalize_phone(phone: str) -> str | None:
+    """
+    Приймає телефон у будь-якому форматі:
+    +380677977166
+    067 797-71-66
+    +38(067) 797-71-66
+    і повертає +380XXXXXXXXX
+    """
+
+    digits = re.sub(r"\D", "", phone)
+
+    if len(digits) == 10 and digits.startswith("0"):
+        return "+38" + digits
+
+    if len(digits) == 12 and digits.startswith("380"):
+        return "+" + digits
+
+    if len(digits) == 13 and digits.startswith("380"):
+        return "+" + digits
+
+    return None
 
 
-# =======================
-# certificate order
-# =======================
-@log_decorator
-async def order_certificate(update, context):
-    user_data = context.user_data
-
-    if "order" not in user_data:
-        user_data["order"] = {}
-
-    print("order_certificate 1 >>> user_data: ", user_data)
-    user_data["service"] = BUTTONS_SERVICE["service_certificate"]
-    print("order_certificate 2 >>> user_data: ", user_data)
-    await header(
-        update,
-        context,
-        buttons=BUTTON_CERTIFICATE,
-        columns=1,
-    )
-    print("order_certificate 3 >>> user_data: ", user_data)
+# async def safe_reply(update, text):
+#     if update.message:
+#         await update.message.reply_text(text)
+#     elif update.callback_query:
+#         await update.callback_query.answer()
+#         await update.callback_query.message.reply_text(text)
 
 
-async def order_certificate_button(update, context):
-    """CallbackQuery handler for the 'Замовити сертифікат' button."""
-    query = update.callback_query.data
-    try:
-        await update.callback_query.answer()
-    except Exception:
-        pass
 
-    if query == "order_certificate":
-        await order_case_0(update, context)
+# -----------------------------
+# 🚀 ENTRY POINT
+# -----------------------------
+async def start_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data.clear()
+    context.user_data["order"] = {}
 
-
-async def order_choice_certificate(update, context):
-    user_data = context.user_data
-
-    context.user_data["mode"] = "certificate"
-    user_data["order"]["massage_type"] = "+++ сертифікат 📄✍️"
-    user_data["order"]["date_time"] = UNKNOWN
-    user_data["order"]["address"] = UNKNOWN
-    await send_text(
-        update,
-        context,
-        "Коментар, побажання щодо сертифікату",
+    # await update.message.reply_text(
+    #     "Будь ласка, вкажіть ваш номер телефону 📞"
+    # )
+    # await safe_reply(update, "Будь ласка, вкажіть номер телефону 📞")
+    await update.effective_message.reply_text(
+        "Будь ласка, вкажіть ваш номер телефону 📞"
     )
 
-
-# =======================
-# order загальний
-# =======================
-async def order_main(update, context, from_service=False):
-    user_data = context.user_data
-    context.user_data["mode"] = "order"
-
-    if "order" not in user_data:
-        user_data["order"] = {}
-
-    if not from_service:
-        user_data["service"] = ""
-
-    user_data["order"] = {}  #
-    await header(update, context, from_service=from_service)  # show header again
-
-    if not from_service:
-        await order_case_0(update, context)
+    return ASK_PHONE
 
 
-# загальний обробник для замовлення масажу і замовлення сертифікату(як окремий вид масажу)
-# він буде викликатися при кожному повідомленні користувача,
-# який знаходиться в режимі "order" або "certificate",
-# і буде визначати, який саме кейс виконувати,
-# в залежності від кількості вже зібраної інформації про замовлення
-# (кількості полів в user_data["order"])
-# --- також при виклику в режимі "massage" він має працювати коректно !!!
-# наприклад, якщо користувач тільки що вибрав "Замовити масаж" і ввів своє ім'я,
-# то в user_data["order"] буде тільки поле "name",
-# і тоді виконається order_case_2,
-# який запитає телефон і запропонує вибір між дзвінком і продовженням оформлення через бота.
-# Якщо користувач вибрав "Продовжити оформлення", то наступним кроком буде вибір виду масажу,
-# і тоді виконається order_case_3, який запитає про вид масажу і потім про день і час.
-# І так далі, поки не буде зібрана вся необхідна інформація для замовлення.
-# Таким чином, order_dialog є універсальним обробником для всього процесу оформлення замовлення,
-# і він визначає, який саме крок виконувати, в залежності від того, яка інформація вже зібрана в user_data["order"].
-# time -> name -> phone -> (дзвінок або <продовжити>) -> вид масажу -> день і час -> адреса -> коментар -> завершення замовлення
-# time -> name -> phone -> (<дзвінок> або продовжити) -> завершення замовлення
-# time -> name -> phone -> (context.user_data["mode"]=="certificate") -> коментар -> завершення замовлення
-async def order_dialog(update, context):
-    user_data = context.user_data
+# -----------------------------
+# 📞 ASK PHONE
+# -----------------------------
+async def ask_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    phone_raw = update.message.text.strip()
+    phone = normalize_phone(phone_raw)
 
-    if "order" not in user_data:
-        user_data["order"] = {}
+    if not phone:
+        await update.message.reply_text(
+            "Невірний формат телефону. Спробуйте ще раз."
+        )
+        return ASK_PHONE
 
-    func = globals().get(f"order_case_{len(user_data["order"])}")
+    context.user_data["order"]["phone"] = phone
 
-    if func is not None:
-        await func(update, context)
-    else:
-        print(f"order_case_{len(user_data["order"])} not found")
+    await update.message.reply_text(
+        "На який час бажаєте записатися? ⏰"
+    )
+    return ASK_TIME
 
 
-async def order_case_0(update, context):  # time + name
-    # цей кейс потрібен, щоб одразу встановити час оформлення замовлення, не чекаючи вводу користувача
-    # але виконуватися він буде тільки при виклику функції order(), а не при виклику order_dialog(), бо час встановлюється одразу при виклику функції order()
-    from datetime import datetime
+# -----------------------------
+# ⏰ ASK TIME
+# -----------------------------
+async def ask_time(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    time_text = update.message.text.strip()
+    context.user_data["order"]["time"] = time_text
 
-    user_data = context.user_data
+    phone = context.user_data["order"]["phone"]
 
-    user_data["order"]["time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    await send_text(update, context, "Як до вас звертатися? \ud83d\ude4c")
+    await update.message.reply_text(
+        f"Підтвердьте запис:\n\n"
+        f"📞 Телефон: {phone}\n"
+        f"⏰ Час: {time_text}\n\n"
+        f"Напишіть 'так' для підтвердження або 'ні' для скасування."
+    )
+
+    return CONFIRM
 
 
-async def order_case_1(update, context):  # name + phone
-    user_data = context.user_data
+# -----------------------------
+# ✅ CONFIRM
+# -----------------------------
+async def confirm(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = update.message.text.lower().strip()
 
-    user_data["order"]["name"] = update.message.text
-    await send_text(update, context, "Ваш номер телефону? \ud83d\ude4c")
+    if text not in ["так", "ні"]:
+        await update.message.reply_text(
+            "Будь ласка, напишіть 'так' або 'ні'."
+        )
+        return CONFIRM
 
+    if text == "ні":
+        await update.message.reply_text("Замовлення скасовано.")
+        context.user_data.clear()
+        return ConversationHandler.END
 
-async def order_case_2(update, context):
-    user_data = context.user_data
-    print("order_case_2 >>> user_data: ", user_data)
+    # ---- ВІДПРАВКА АДМІНУ ----
+    order = context.user_data["order"]
 
-    # phone + buttons (продовжити або дзвінок)
-    user_data["order"]["phone"] = update.message.text
+    admin_chat_id = context.bot_data.get("ADMIN_ID")
 
-    # if user_data["mode"] in ["certificate", "service_certificate"]:
-    if user_data["service"] in [
-        "Подарунковий сертифікат",
-    ]:
-        await order_choice_certificate(update, context)
-    else:
-        await send_text_buttons(
-            update,
-            context,
-            "🔔 Чекаю на дзвінок – продовжимо телефоном\n✅ Продовжити – оформляємо заявку за допомогою бота",
-            {
-                "order_phone_call": "🔔 Чекаю на дзвінок",
-                "order_phone_continue": "✅ Продовжити оформлення",
-            },
+    if admin_chat_id:
+        await context.bot.send_message(
+            chat_id=admin_chat_id,
+            text=(
+                "🆕 НОВЕ ЗАМОВЛЕННЯ\n\n"
+                f"📞 Телефон: {order['phone']}\n"
+                f"⏰ Час: {order['time']}"
+            ),
         )
 
-
-async def order_phone_button(update, context):
-    user_data = context.user_data
-
-    # обробник кнопок після вводу телефону (продовжити або дзвінок)
-    query = update.callback_query.data
-    try:
-        await update.callback_query.answer()
-    except Exception:
-        pass
-
-    if query == "order_phone_call":
-        # Встановити фіктивні значення для решти полів і перейти до order_call_to_admin, щоб не ускладнювати діалог з користувачем, який вибрав дзвінок, додатковими питаннями
-        if user_data["service"]:
-            user_data["order"]["massage_type"] = user_data["service"]
-        else:
-            user_data["order"]["massage_type"] = UNKNOWN
-        user_data["order"]["date_time"] = UNKNOWN
-        user_data["order"]["address"] = UNKNOWN
-        user_data["order"]["comment"] = "чекаю на дзвінок 📞->☎️"
-        await order_call_to_admin(update, context)
-
-    elif query == "order_phone_continue":
-        if user_data["service"]:
-            user_data["order"]["massage_type"] = user_data["service"]
-            await order_day_time(update, context)
-        else:
-            await send_text_buttons(
-                update,
-                context,
-                "Який вид масажу ви б хотіли?",
-                BUTTONS_SERVICE,
-            )
-
-
-async def order_case_3(update, context):  # massage_type + date_time
-    # вид масажу - при переході з переліку масажів ми вже знаємо вид масажу, це треба оформити
-    user_data = context.user_data
-    print("order_case_3 >>> user_data: ", user_data)
-
-    # if user_data["mode"] in ["certificate", "service_certificate"]:
-    if user_data["service"] in [
-        "Подарунковий сертифікат",
-    ]:
-        await order_choice_certificate(update, context)
-
-    else:
-        try:
-            user_data["order"]["massage_type"] = update.message.text
-        except Exception:
-            user_data["order"]["massage_type"] = (
-                user_data["service"] if user_data["service"] else update.message.text
-            )
-        await order_day_time(update, context)
-
-
-async def order_day_time(update, context):
-    # питання про час і день масажу, виконується після вибору виду масажу або після вибору "Свій варіант"
-    await send_text(
-        update,
-        context,
-        "Коли вам зручно? (День, час)\ud83d\ude4c \n\nНаприклад: \n\t\t'завтра після 18:00' \n\t\t  або 'щоп'ятниці вдень' \n\t\t  або 'на вихідних' і т.д.",
+    await update.message.reply_text(
+        "Дякуємо! Заявку прийнято. Менеджер зв'яжеться з вами найближчим часом."
     )
 
-
-async def order_case_4(update, context):  # date_time + address
-    user_data = context.user_data
-
-    user_data["order"]["date_time"] = update.message.text
-    await send_text(update, context, "Ваша адреса \ud83d\ude4c")
+    context.user_data.clear()
+    return ConversationHandler.END
 
 
-async def order_case_5(update, context):  # address + comment
-    user_data = context.user_data
+# -----------------------------
+# ❌ CANCEL
+# -----------------------------
+async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data.clear()
+    await update.message.reply_text("Замовлення скасовано.")
+    return ConversationHandler.END
 
-    user_data["order"]["address"] = update.message.text
-    await send_text(
-        update,
-        context,
-        "Коментар, побажання щодо масажу \ud83d\ude4c \n\nНаприклад: \n\t\t'хочу інтенсивний масаж обличчя' \n\t\t  або 'попередньо хочу консультацію'  і т.д.",
+
+# -----------------------------
+# 🧩 HANDLER BUILDER
+# -----------------------------
+def get_order_conversation_handler():
+    print(">>> get_order_conversation_handler started")
+    return ConversationHandler(
+        entry_points=[CommandHandler("order", start_order)],
+        states={
+            ASK_PHONE: [MessageHandler(filters.TEXT & ~filters.COMMAND, ask_phone)],
+            ASK_TIME: [MessageHandler(filters.TEXT & ~filters.COMMAND, ask_time)],
+            CONFIRM: [MessageHandler(filters.TEXT & ~filters.COMMAND, confirm)],
+        },
+        fallbacks=[CommandHandler("cancel", cancel)],
+        name="order_conversation",
+        persistent=False,
     )
-
-
-async def order_case_6(update, context):  # comment + order_call_to_admin
-    user_data = context.user_data
-
-    user_data["order"]["comment"] = update.message.text
-
-    await order_call_to_admin(update, context)
-
-
-async def order_call_to_admin(update, context):
-    user_data = context.user_data
-    user = update.effective_user
-    order_data = [user.full_name, user.username, user.id, user.is_bot]
-
-    # завершення оформлення замовлення
-
-    # 1. надсилаємо адміну повідомлення з інформацією про замовлення
-    order_info = dialog_user_info_to_str(user_data["order"])
-    admin_message = f"📋 Нове замовлення масажу:\n {order_data}\n\n{order_info}"
-    await context.bot.send_message(chat_id=TELEGRAM_KYRYLO_ID, text=admin_message)
-    # await context.bot.send_message(chat_id=TELEGRAM_ADMIN_ID, text=admin_message)
-
-    # 2. надсилаємо користувачу повідомлення про успішне оформлення замовлення
-    context.user_data["mode"] = "thanks"
-    await header(update, context, buttons=BUTTONS_MAIN)

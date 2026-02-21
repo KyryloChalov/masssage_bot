@@ -1,0 +1,24 @@
+/.mypy_cache
+/__pycache__
+/venv
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.sqlite3
+*.db
+*.env
+.DS_Store
+.idea
+.vscode
+*.psd
+*.zip
+*.tar.gz
+demo_*.*
+test_*.*
+*.* copy
+*.bak
+*.tmp
+*.env copy
+*_old.*
+*_log.json
