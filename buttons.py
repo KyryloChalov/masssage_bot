@@ -1,4 +1,4 @@
-BUTTONS_MAIN = {
+BUTTONS_START = {
     "main_massage": "Види масажу",
     "main_order": "Замовити масаж",
     # "main_helper": "Допомога у виборі масажу",
@@ -8,27 +8,25 @@ BUTTONS_MAIN = {
     "main_info": "Найчастіші запитання",
 }
 
-MODE_MAPPING = {
-    # "main_helper": "helper",
-    # "main_helper_2": "helper_2",
-    "main_price": "price",
-    "main_location": "location",
-    "main_info": "info",
-    "main_order": "order",
-    "main_massage": "massage",
-    "main_certificate": "certificate",
-}
-
 
 BUTTONS_MENU = {
     "start": "головне меню бота",
     "order": "Замовити масаж",
     # "helper": "Допомога у виборі масажу",
-    # "price": "Ціна на послуги",
-    # "location": "Де ми працюємо",
     "info": "Найчастіші запитання",
     "gpt": "Задати питання чату GPT 🧠",
 }
+
+# MODE_MAPPING = {
+#     # "main_helper": "helper",
+#     # "main_helper_2": "helper_2",
+#     "main_price": "price",
+#     "main_location": "location",
+#     "main_info": "info",
+#     "main_order": "order",
+#     "main_massage": "massage",
+#     "main_certificate": "certificate",
+# }
 
 
 BUTTONS_HELPER = {

@@ -10,43 +10,10 @@ from telegram.ext import (
     filters,
 )
 
+from util import header, extract_phone
+
 # ---- STATES ----
 ASK_PHONE, ASK_TIME, CONFIRM = range(3)
-
-
-# -----------------------------
-# 📌 PHONE NORMALIZATION
-# -----------------------------
-def normalize_phone(phone: str) -> str | None:
-    """
-    Приймає телефон у будь-якому форматі:
-    +380677977166
-    067 797-71-66
-    +38(067) 797-71-66
-    і повертає +380XXXXXXXXX
-    """
-
-    digits = re.sub(r"\D", "", phone)
-
-    if len(digits) == 10 and digits.startswith("0"):
-        return "+38" + digits
-
-    if len(digits) == 12 and digits.startswith("380"):
-        return "+" + digits
-
-    if len(digits) == 13 and digits.startswith("380"):
-        return "+" + digits
-
-    return None
-
-
-# async def safe_reply(update, text):
-#     if update.message:
-#         await update.message.reply_text(text)
-#     elif update.callback_query:
-#         await update.callback_query.answer()
-#         await update.callback_query.message.reply_text(text)
-
 
 
 # -----------------------------
@@ -56,10 +23,8 @@ async def start_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data.clear()
     context.user_data["order"] = {}
 
-    # await update.message.reply_text(
-    #     "Будь ласка, вкажіть ваш номер телефону 📞"
-    # )
-    # await safe_reply(update, "Будь ласка, вкажіть номер телефону 📞")
+    await header(update, context)
+
     await update.effective_message.reply_text(
         "Будь ласка, вкажіть ваш номер телефону 📞"
     )
@@ -72,19 +37,15 @@ async def start_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # -----------------------------
 async def ask_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
     phone_raw = update.message.text.strip()
-    phone = normalize_phone(phone_raw)
+    phone = extract_phone(phone_raw)
 
     if not phone:
-        await update.message.reply_text(
-            "Невірний формат телефону. Спробуйте ще раз."
-        )
+        await update.message.reply_text("Невірний формат телефону. Спробуйте ще раз.")
         return ASK_PHONE
 
     context.user_data["order"]["phone"] = phone
 
-    await update.message.reply_text(
-        "На який час бажаєте записатися? ⏰"
-    )
+    await update.message.reply_text("На який час бажаєте записатися? ⏰")
     return ASK_TIME
 
 
@@ -114,9 +75,7 @@ async def confirm(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.lower().strip()
 
     if text not in ["так", "ні"]:
-        await update.message.reply_text(
-            "Будь ласка, напишіть 'так' або 'ні'."
-        )
+        await update.message.reply_text("Будь ласка, напишіть 'так' або 'ні'.")
         return CONFIRM
 
     if text == "ні":
@@ -160,7 +119,7 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # 🧩 HANDLER BUILDER
 # -----------------------------
 def get_order_conversation_handler():
-    print(">>> get_order_conversation_handler started")
+    # print('get_order_conversation_handler started')
     return ConversationHandler(
         entry_points=[CommandHandler("order", start_order)],
         states={

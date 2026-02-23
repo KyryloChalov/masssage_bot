@@ -16,6 +16,7 @@
 *.tar.gz
 demo_*.*
 test_*.*
+*_test.*
 *.* copy
 *.bak
 *.tmp

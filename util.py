@@ -21,6 +21,8 @@ from phonenumbers import (
 )
 import re
 
+import inspect
+
 from pprint import pprint
 
 from colors import RED, RESET, YELLOW, LIGHTBLUE
@@ -30,11 +32,9 @@ from colors import RED, RESET, YELLOW, LIGHTBLUE
 # Допоміжні functions
 # =======================
 # декоратор щоб побачити user_data на початку та після виконання функції
-def log_decorator(func, echo = False):
+def log_decorator(func, echo=False):
     def wrapper(update, context, *args, **kwargs):
-        # print(f"func {func.__name__} args {args} kwargs {kwargs}")
         print(f"{LIGHTBLUE}<<< {YELLOW}{func.__name__} {LIGHTBLUE}>>> {RESET}")
-        # print(f"\t begin: {context}")
         if echo:
             print(f"\t begin: {context.user_data}")
             print(f"\t  args: {args}")
@@ -43,49 +43,32 @@ def log_decorator(func, echo = False):
         result = func(update, context, *args, **kwargs)
         if echo:
             print(f"\t   end: {context.user_data}")
-            # print(f"        update: {update}")
         return result
 
     return wrapper
 
+
+# вже не треба???
+def caller_name():
+    return inspect.stack()[2].function
+
+
+# формує та виводить header: фото + текст + кнопки(якщо є)
 @log_decorator
-async def init_user_date(update, context):
-    user_data = context.user_data
-    user_data["service"] = ""
-    user_data["mode"] = ""
-    user_data["order"] = {}
-    user_data["gpt_history"] = []
-    user_data["full_history"] = []
+async def header(update, context, mode=None, buttons: dict = {}, columns: int = 2):
+    mode = mode if mode else inspect.stack()[1].function  # хто мене викликав?
+    print("\tmode: ", mode)  # debug
 
+    try:
+        await send_photo(update, context, mode)
+    except Exception:
+        print(f">>> info: відсутній файл {mode}.jpg")
 
-# формує header: фото + текст + кнопки
-# TODO зробити single response
-@log_decorator
-async def header(
-    update, context, from_service=False, buttons: dict = {}, columns: int = 2
-):
-    user_data = context.user_data
-
-    await send_photo(update, context, user_data["mode"])
-
-    if "gpt_history" not in user_data:
-        user_data["gpt_history"] = []
-    if not from_service:
-        user_data["service"] = ""
-        user_data["order"] = {}
-
-    # print("header >>> context.user_data: ", user_data) # debug
-
-    msg = load_message(context.user_data["mode"])
+    msg = load_message(mode)
     if buttons == {}:
         await send_text(update, context, msg)
     else:
         await send_text_buttons(update, context, msg, buttons, columns=columns)
-
-
-async def set_mode(mode_name, update, context):
-    context.user_data["mode"] = mode_name
-    await header(update, context)
 
 
 # конвертує об'єкт user в рядок
@@ -105,7 +88,7 @@ def dialog_user_info_to_str(user) -> str:
             result += name + ": " + user[key] + "\n"
     return result
 
-
+# замість normalize_phone поставити цю 
 def extract_phone(text: str, region="UA"):
     """
     Повертає номер у форматі +380XXXXXXXXX
@@ -126,7 +109,33 @@ def extract_phone(text: str, region="UA"):
     return None
 
 
-def normalize_phone(phone_raw: str) -> str:
+# -----------------------------
+# 📌 PHONE NORMALIZATION
+# -----------------------------
+def normalize_phone(phone: str) -> str | None:
+    """
+    Приймає телефон у будь-якому форматі:
+    +380677977166
+    067 797-71-66
+    +38(067) 797-71-66
+    і повертає +380XXXXXXXXX
+    """
+
+    digits = re.sub(r"\D", "", phone)
+
+    if len(digits) == 10 and digits.startswith("0"):
+        return "+38" + digits
+
+    if len(digits) == 12 and digits.startswith("380"):
+        return "+" + digits
+
+    if len(digits) == 13 and digits.startswith("380"):
+        return "+" + digits
+
+    return None
+
+
+def normalize_phone_(phone_raw: str) -> str:
 
     # патерн українського телефону
     # phone_pattern = r"(\+?38)?[\s\-()]*0\d{2}[\s\-()]*\d{3}[\s\-()]*\d{2}[\s\-()]*\d{2}"
@@ -164,6 +173,7 @@ async def send_text(
     return await context.bot.send_message(
         chat_id=update.effective_chat.id, text=text, parse_mode=ParseMode.MARKDOWN
     )
+    # return await update.message.reply_text(text)
 
 
 # надсилає в чат html-повідомлення

@@ -1,5 +1,3 @@
-# gpt.py
-
 from telegram import Update
 from telegram.ext import (
     ConversationHandler,
@@ -9,63 +7,51 @@ from telegram.ext import (
     filters,
 )
 
+from util import header
+
+
 GPT_CHAT = 1
 
 
 def get_gpt_conversation_handler(gpt_service):
 
     async def start_gpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        context.user_data["gpt_history"] = []
-
-        await update.effective_message.reply_text(
-            "🤖 GPT режим активовано.\n"
-            "Напишіть питання.\n"
-            "Для виходу — /stop"
-        )
-
+        await header(update, context)
+        # await update.message.reply_text(
+        #     "🤖 GPT режим активовано.\n" "Пишіть питання.\n" "Для виходу — /stop"
+        # )
         return GPT_CHAT
 
+    async def chat(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        user_id = update.effective_user.id
+        user_text = update.message.text
 
-    async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        user_text = update.effective_message.text
-
-        await update.effective_message.reply_text("⏳ Думаю...")
+        await update.message.reply_text("⏳ Думаю...")
 
         try:
-            answer = await gpt_service.send_question(
-                system_prompt="Ти помічник масажного салону.",
-                user_input=user_text,
-                max_output_tokens=400,
-            )
-
-            await update.effective_message.reply_text(answer)
-
-        except Exception:
+            answer = await gpt_service.ask(user_id, user_text)
+            await update.message.reply_text(answer)
+        # except Exception:
+        #     await update.message.reply_text("Сталася помилка. Спробуйте пізніше.")
+        except Exception as e:
             await update.effective_message.reply_text(
-                "Сталася помилка. Спробуйте пізніше."
+                f"Сталася помилка{e}. Спробуйте пізніше"
             )
 
         return GPT_CHAT
 
-
     async def stop_gpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        context.user_data.pop("gpt_history", None)
-
-        await update.effective_message.reply_text("GPT режим завершено.")
-
+        gpt_service.repo.clear_history(update.effective_user.id)
+        await header(update, context)
+        # await update.message.reply_text("GPT режим завершено.")
         return ConversationHandler.END
-
 
     return ConversationHandler(
         entry_points=[CommandHandler("gpt", start_gpt)],
-        states={
-            GPT_CHAT: [
-                MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message),
-            ],
-        },
-        fallbacks=[
-            CommandHandler("stop", stop_gpt),
-        ],
+        states={GPT_CHAT: [MessageHandler(filters.TEXT & ~filters.COMMAND, chat)]},
+        fallbacks=[CommandHandler("stop", stop_gpt)],
         per_user=True,
         per_chat=True,
     )
+
+
