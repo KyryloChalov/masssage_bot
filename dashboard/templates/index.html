@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<p>Всього GPT повідомлень: {{ total_messages }}</p>
+<p>Унікальних користувачів: {{ total_users }}</p>
+
+<h2>Користувачі</h2>
+<ul>
+{% for user in users %}
+    <li><a href="/user/{{ user }}">User {{ user }}</a></li>
+{% endfor %}
+</ul>
+{% endblock %}

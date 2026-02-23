@@ -1,4 +1,4 @@
-from util import (
+from include.util import (
     header,
     send_text,
     send_text_buttons,
@@ -6,9 +6,9 @@ from util import (
     log_decorator,
 )
 
-from buttons import BUTTONS_MAIN, BUTTONS_SERVICE, BUTTON_CERTIFICATE
+from include.buttons import BUTTONS_MAIN, BUTTONS_SERVICE, BUTTON_CERTIFICATE
 
-from from_env import TELEGRAM_ADMIN_ID, TELEGRAM_KYRYLO_ID
+from include.from_env import TELEGRAM_ADMIN_ID, TELEGRAM_KYRYLO_ID
 
 from pprint import pprint
 

@@ -51,6 +51,8 @@ class ChatGptService:
         result = await self.send_message_list(max_tokens=max_tokens)
         return normalize_answer(result)
 
+        answer = await chatgpt.send_question(SYSTEM_PROMPT, input_text, max_tokens=300)
+
 
 chatgpt = ChatGptService(token=TOKEN_GPT)
 

@@ -10,7 +10,7 @@ from telegram.ext import (
     filters,
 )
 
-from util import header, extract_phone
+from include.util import header, extract_phone
 
 # ---- STATES ----
 ASK_PHONE, ASK_TIME, CONFIRM = range(3)

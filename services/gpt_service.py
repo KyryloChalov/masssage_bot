@@ -2,6 +2,8 @@ import asyncio
 from openai import AsyncOpenAI
 from storage.gpt_repository import GptRepository
 
+from include.sys_prompt import BUSINESS_INFO, SYSTEM_PROMPT
+
 
 class ChatGptService:
     def __init__(
@@ -24,9 +26,8 @@ class ChatGptService:
         history = self.repo.get_history(user_id, self.max_history)
 
         # 3️⃣ додаємо system prompt
-        messages = [
-            {"role": "system", "content": "Ти помічник масажного салону."}
-        ] + history
+        messages = [{"role": "system", "content": SYSTEM_PROMPT}] + history
+        # messages.append(BUSINESS_INFO)
 
         # 4️⃣ виклик GPT з retry
         for attempt in range(3):

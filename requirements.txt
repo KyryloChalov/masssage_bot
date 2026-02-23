@@ -3,3 +3,6 @@ openai==1.86.0
 python-telegram-bot==22.1
 phonenumbers==9.0.24
 python-dotenv
+fastapi 
+uvicorn 
+jinja2

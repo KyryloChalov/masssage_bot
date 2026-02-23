@@ -9,7 +9,7 @@ from telegram.ext import (
 
 from gpt import handle_gpt
 
-from util import (
+from include.util import (
     header,
     set_mode,
     send_text,
@@ -25,7 +25,7 @@ from order import (
     order_certificate,
     order_certificate_button,
 )
-from buttons import (
+from include.buttons import (
     # BUTTONS_HELPER,
     # BUTTONS_HELPER_2,
     BUTTONS_MAIN,
@@ -38,7 +38,7 @@ from buttons import (
     BUTTONS_SERVICE,
 )
 
-from from_env import TOKEN_TELEGRAM
+from include.from_env import TOKEN_TELEGRAM
 
 
 # =======================

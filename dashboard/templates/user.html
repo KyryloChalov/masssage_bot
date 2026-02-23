@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Історія користувача {{ user_id }}</h2>
+
+<ul>
+{% for role, content, created_at in history %}
+    <li>
+        <strong>{{ role }}</strong> ({{ created_at }}):<br>
+        {{ content }}
+    </li>
+{% endfor %}
+</ul>
+
+<a href="/">Назад</a>
+{% endblock %}

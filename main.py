@@ -10,11 +10,11 @@ from order import get_order_conversation_handler
 from gpt import get_gpt_conversation_handler
 from services.gpt_service import ChatGptService
 
-from from_env import TOKEN_TELEGRAM, TOKEN_GPT
+from include.from_env import TOKEN_TELEGRAM, TOKEN_GPT
 
-from util import header, show_main_menu
+from include.util import header, show_main_menu
 
-from buttons import BUTTONS_START, BUTTONS_MENU
+from include.buttons import BUTTONS_START, BUTTONS_MENU
 
 
 async def start_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
