@@ -6,34 +6,15 @@ from telegram.ext import (
     ContextTypes,
     filters,
 )
-from openai import RateLimitError
-# import json
-# import time
 
 from include.from_env import TELEGRAM_KYRYLO_ID
-# from include.sys_prompt import BUSINESS_INFO, SYSTEM_PROMPT
 from include.util import header, extract_phone
 
-# from storage.gpt_repository import get_history
+from include.colors import RED, RESET
 
 CONFIRM_MESSAGE = "Дякую! Передаю інформацію менеджеру.\n\n>>> Очікуйте на дзвінок 📞"
-# last_orders: dict[str, str] = {}
 
 GPT_CHAT = 1
-
-
-# # чат повертає відповідь у форматі json
-# # {"order": false, "message": "твоя відповідь клієнту"}
-# # функція normalize_answer виводить на екран тільки message
-# def normalize_answer(answer_raw):
-#     if isinstance(answer_raw, dict):
-#         return answer_raw.get("message")
-#     elif isinstance(answer_raw, str):
-#         try:
-#             data = json.loads(answer_raw)
-#             return data.get("message")
-#         except json.JSONDecodeError:
-#             return answer_raw  # рядок не JSON, просто друкуємо
 
 
 def get_gpt_conversation_handler(gpt_service):
@@ -46,63 +27,42 @@ def get_gpt_conversation_handler(gpt_service):
         user_id = update.effective_user.id
         user_text = update.message.text.strip()
 
+        my_message = await update.message.reply_text("⏳ . . . ")
 
-        #     input_text = f"""
-        # ІНФОРМАЦІЯ ПРО СЕРВІС:{BUSINESS_INFO}
-        # ІСТОРІЯ ПИТАНЬ КЛІЄНТА:{user_history}
-        # ПИТАННЯ КЛІЄНТА:{user_text}
-        # """
+        # ---------- GPT RESPONSE ----------
         try:
-            my_message = await update.message.reply_text("⏳ . . . ")
-            # завдання - отримати номер телефону юзера
+            print("chat >>> try >>> point 1")
+            answer, gpt_history = await gpt_service.ask(user_id, user_text)
+            print("chat >>> try >>> point 2")
+
+            await my_message.edit_text(answer)
+            print("chat >>> try >>> point 3")
+
+            # отримано номер телефону?
             phone = extract_phone(user_text)
 
             if phone:
                 print("chat >>> phone: ", phone)
+                user = update.effective_user
+                # gpt_history = gpt_service.history_from_db(user.id) # ???? що це???
 
-                # gpt_history = get_history
+                order_data = {
+                    "name": user.full_name,
+                    "username": user.username,
+                    "user_id": user.id,
+                    "phone": phone,
+                    "dialog": gpt_history,
+                }
 
-                # order_data = {
-                #     "name": user.full_name,
-                #     "username": user.username,
-                #     "user_id": user.id,
-                #     "phone": phone,
-                #     # "dialog": gpt_history,
-                # }
-
-                # await notify_admin(context, order_data)
-
-                # header?
-                await my_message.edit_text(CONFIRM_MESSAGE)
                 await header(update, context, "thanks")
 
-                return
+                await notify_admin(context, order_data)
 
-            # якщо це не замовлення → працюємо через GPT
-            # ---------- GPT RESPONSE ----------
-            try:
-                answer = await gpt_service.ask(user_id, user_text)
-                # await update.message.reply_text(answer)
-
-                await my_message.edit_text(answer)
-
-            except Exception as e:
-                await update.effective_message.reply_text(
-                    f"Сталася помилка{e}. Спробуйте пізніше"
-                )
-                print("user_id: ", user_id)
-                print("user_text: ", user_text)
-                print("answer: ", answer)
-
-        except RateLimitError:
-            await update.message.reply_text(
-                update,
-                context,
-                "Зараз надто багато запитів. Спробуйте через кілька секунд.",
-            )
         except Exception as e:
-            await update.message.reply_text(update, context, f"Виникла помилка: {e}")
-
+            await update.effective_message.reply_text(
+                "Сталася помилка. Спробуйте пізніше"
+            )
+            print(RED, f"Сталася помилка: {e}. Спробуйте пізніше", RESET)
         return GPT_CHAT
 
     async def stop_gpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -131,8 +91,7 @@ async def notify_admin(context, order_data):
 🆔 ID: {order_data.get("user_id")}
 📞 Телефон: {order_data.get("phone")}
 
-💬 Останній діалог:
-{order_data.get("dialog")}
+💬 Останній діалог:{order_data.get("dialog")}
 """
     await context.bot.send_message(chat_id=TELEGRAM_KYRYLO_ID, text=message)
 
@@ -142,10 +101,3 @@ async def notify_admin(context, order_data):
     #         chat_id=admin_id,
     #         text=message
     #     )
-
-
-# def save_order_to_file(order_data):
-#     order_data["created_at"] = datetime.now().isoformat()
-
-#     with open("orders_log.json", "a", encoding="utf-8") as f:
-#         f.write(json.dumps(order_data, ensure_ascii=False) + "\n")

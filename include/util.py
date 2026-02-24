@@ -33,16 +33,18 @@ from include.colors import RED, RESET, YELLOW, LIGHTBLUE
 # =======================
 # декоратор щоб побачити user_data на початку та після виконання функції
 def log_decorator(func, echo=False):
-    def wrapper(update, context, *args, **kwargs):
+    # def wrapper(update, context, *args, **kwargs):
+    def wrapper(*args, **kwargs):
         print(f"{LIGHTBLUE}<<< {YELLOW}{func.__name__} {LIGHTBLUE}>>> {RESET}")
-        if echo:
-            print(f"\t begin: {context.user_data}")
-            print(f"\t  args: {args}")
+        # if echo:
+        #     print(f"\t begin: {context.user_data}")
+        #     print(f"\t  args: {args}")
             # print(f"\tkwargs: {kwargs}")
 
-        result = func(update, context, *args, **kwargs)
-        if echo:
-            print(f"\t   end: {context.user_data}")
+        # result = func(update, context, *args, **kwargs)
+        result = func(*args, **kwargs)
+        # if echo:
+        #     print(f"\t   end: {context.user_data}")
         return result
 
     return wrapper
@@ -72,6 +74,7 @@ async def header(update, context, mode=None, buttons: dict = {}, columns: int = 
 
 
 # конвертує об'єкт user в рядок
+@log_decorator
 def dialog_user_info_to_str(user) -> str:
     result = ""
     map = {
@@ -89,11 +92,13 @@ def dialog_user_info_to_str(user) -> str:
     return result
 
 # замість normalize_phone поставити цю 
+@log_decorator
 def extract_phone(text: str, region="UA"):
     """
     Повертає номер у форматі +380XXXXXXXXX
     або None якщо номер невалідний
     """
+    print('extract_phone >>> text: ', text)
     try:
         for match in PhoneNumberMatcher(text, region):
             number = match.number
@@ -101,7 +106,9 @@ def extract_phone(text: str, region="UA"):
             # перевірка валідності
             if is_valid_number(number):
                 # повертаємо у міжнародному форматі
-                return format_number(number, PhoneNumberFormat.E164)
+                result = format_number(number, PhoneNumberFormat.E164)
+                print('extract_phone >>> result: ', result)
+                return result
 
     except NumberParseException:
         return None
@@ -112,6 +119,7 @@ def extract_phone(text: str, region="UA"):
 # -----------------------------
 # 📌 PHONE NORMALIZATION
 # -----------------------------
+@log_decorator
 def normalize_phone(phone: str) -> str | None:
     """
     Приймає телефон у будь-якому форматі:
