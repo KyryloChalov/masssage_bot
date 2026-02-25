@@ -23,7 +23,7 @@ def detect_intent(text: str) -> Intent:
     if "ціна" in text or "вартість" in text:
         return Intent.PRICE
 
-    if "запис" in text or "хочу записатися" in text:
+    if "запис" in text or "записатися" in text:
         return Intent.BOOKING
 
     if "сертифікат" in text:

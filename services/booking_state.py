@@ -2,6 +2,7 @@
 
 from enum import Enum
 
+
 class BookingStep(str, Enum):
     IDLE = "idle"
     ASK_DATE = "ask_date"
@@ -11,7 +12,8 @@ class BookingStep(str, Enum):
     CONFIRMATION = "confirmation"
     COMPLETED = "completed"
     CANCELLED = "cancelled"
-    
+
+
 class BookingState:
     def __init__(self):
         self.step = BookingStep.IDLE
@@ -32,5 +34,3 @@ class BookingState:
 
     def exceeded_retries(self):
         return self.retry_count > self.max_retries
-    
-

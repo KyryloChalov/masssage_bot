@@ -32,7 +32,8 @@ def get_gpt_conversation_handler(gpt_service):
         # ---------- GPT RESPONSE ----------
         try:
             print("chat >>> try >>> point 1")
-            answer, gpt_history = await gpt_service.ask(user_id, user_text)
+            # answer, gpt_history = await gpt_service.ask(user_id, user_text)
+            answer = await gpt_service.ask(user_id, user_text)
             print("chat >>> try >>> point 2")
 
             await my_message.edit_text(answer)
@@ -44,7 +45,7 @@ def get_gpt_conversation_handler(gpt_service):
             if phone:
                 print("chat >>> phone: ", phone)
                 user = update.effective_user
-                # gpt_history = gpt_service.history_from_db(user.id) # ???? що це???
+                gpt_history = await gpt_service.history_from_db(user.id)
 
                 order_data = {
                     "name": user.full_name,

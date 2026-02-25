@@ -40,11 +40,21 @@ async def main_button(update, context):
     except Exception:
         pass
 
+# 🧠 Важливий нюанс (професійний рівень)
+# Якщо ти плануєш:
+# багато бізнесів
+# багато користувачів
+# multi-tenant
+# Тоді не можна робити один глобальний gpt_service.
+# Треба створювати його динамічно:
+# def get_gpt_service(business_id):
+#     return ChatGptService(business_id)
 
 def main():
     application = Application.builder().token(str(TOKEN_TELEGRAM)).build()
 
-    gpt_service = ChatGptService(TOKEN_GPT)
+    gpt_service = ChatGptService(TOKEN_GPT, business_id=1)
+    # gpt_service = ChatGptService(TOKEN_GPT, business=1)
 
     application.add_handler(CommandHandler("start", start_bot))
     application.add_handler(get_order_conversation_handler())
