@@ -1,7 +1,7 @@
 
-from include.business_info import BUSINESS_INFO
+from repositories.business_info import BUSINESS_INFO
 # from include.business_formatter import format_business_info
-from include.sys_prompt import SYSTEM_PROMPT
+from repositories.sys_prompt import SYSTEM_PROMPT
 
 
 

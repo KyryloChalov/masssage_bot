@@ -1,6 +1,6 @@
 from datetime import time
-from include.business_info import BUSINESS_INFO
-from models.business_model import Business
+from repositories.business_info import BUSINESS_INFO
+from model.business import Business
 
 
 class BusinessRepository:
@@ -20,9 +20,11 @@ class BusinessRepository:
     @classmethod
     def get(cls, business_id: int) -> Business:
         business = cls._businesses.get(business_id)
-        print('business: ', business)
 
         if not business:
             raise ValueError("Business not found")
 
+        print("business: ", business.name)
+        print("phone:   ", business.phone)
+        
         return business

@@ -1,17 +1,3 @@
-from telegram import (
-    InlineKeyboardButton,
-    InlineKeyboardMarkup,
-    Message,
-    BotCommand,
-    MenuButtonCommands,
-    BotCommandScopeChat,
-    MenuButtonDefault,
-)
-from telegram import Update
-from telegram.constants import ParseMode
-from telegram.ext import ContextTypes
-
-# import phonenumbers
 from phonenumbers import (
     NumberParseException,
     PhoneNumberMatcher,
@@ -22,6 +8,8 @@ from phonenumbers import (
 import re
 
 import inspect
+
+from datetime import datetime
 
 from pprint import pprint
 
@@ -39,7 +27,7 @@ def log_decorator(func, echo=False):
         # if echo:
         #     print(f"\t begin: {context.user_data}")
         #     print(f"\t  args: {args}")
-            # print(f"\tkwargs: {kwargs}")
+        # print(f"\tkwargs: {kwargs}")
 
         # result = func(update, context, *args, **kwargs)
         result = func(*args, **kwargs)
@@ -53,24 +41,6 @@ def log_decorator(func, echo=False):
 # вже не треба???
 def caller_name():
     return inspect.stack()[2].function
-
-
-# формує та виводить header: фото + текст + кнопки(якщо є)
-@log_decorator
-async def header(update, context, mode=None, buttons: dict = {}, columns: int = 2):
-    mode = mode if mode else inspect.stack()[1].function  # хто мене викликав?
-    print("\tmode: ", mode)  # debug
-
-    try:
-        await send_photo(update, context, mode)
-    except Exception:
-        print(f">>> info: відсутній файл {mode}.jpg")
-
-    msg = load_message(mode)
-    if buttons == {}:
-        await send_text(update, context, msg)
-    else:
-        await send_text_buttons(update, context, msg, buttons, columns=columns)
 
 
 # конвертує об'єкт user в рядок
@@ -91,14 +61,15 @@ def dialog_user_info_to_str(user) -> str:
             result += name + ": " + user[key] + "\n"
     return result
 
-# замість normalize_phone поставити цю 
+
+# замість normalize_phone поставити цю
 @log_decorator
 def extract_phone(text: str, region="UA"):
     """
     Повертає номер у форматі +380XXXXXXXXX
     або None якщо номер невалідний
     """
-    print('extract_phone >>> text: ', text)
+    # print('extract_phone >>> text: ', text)
     try:
         for match in PhoneNumberMatcher(text, region):
             number = match.number
@@ -107,7 +78,7 @@ def extract_phone(text: str, region="UA"):
             if is_valid_number(number):
                 # повертаємо у міжнародному форматі
                 result = format_number(number, PhoneNumberFormat.E164)
-                print('extract_phone >>> result: ', result)
+                print("extract_phone >>> result: ", result)
                 return result
 
     except NumberParseException:
@@ -168,116 +139,39 @@ def normalize_phone_(phone_raw: str) -> str:
     return None
 
 
-# надсилає в чат текстове повідомлення
-async def send_text(
-    update: Update, context: ContextTypes.DEFAULT_TYPE, text: str
-) -> Message:
-    if text.count("_") % 2 != 0:
-        message = f"Рядок '{text}' є невалідним з погляду markdown. Скористайтеся методом send_html()"
-        print(message)
-        return await update.effective_message.reply_text(message)
-
-    text = text.encode("utf16", errors="surrogatepass").decode("utf16")
-    return await context.bot.send_message(
-        chat_id=update.effective_chat.id, text=text, parse_mode=ParseMode.MARKDOWN
-    )
-    # return await update.message.reply_text(text)
+def validate_date(text: str):
+    print("validate_date: ", text)
+    try:
+        parsed = datetime.strptime(text, "%d.%m.%Y")
+        print("validate_date >>> parsed: ", parsed)
+        if parsed.date() < datetime.today().date():
+            return None
+        return parsed.date()
+    except Exception:
+        return None
 
 
-# надсилає в чат html-повідомлення
-async def send_html(
-    update: Update, context: ContextTypes.DEFAULT_TYPE, text: str
-) -> Message:
-    text = text.encode("utf16", errors="surrogatepass").decode("utf16")
-    return await context.bot.send_message(
-        chat_id=update.effective_chat.id, text=text, parse_mode=ParseMode.HTML
-    )
+def validate_time(text: str, working_hours: tuple):
+    print("validate_time: ", text)
+    print("working_hours: ", working_hours)
+    try:
+        parsed = datetime.strptime(text, "%H:%M").time()
+        start, end = working_hours
+        if start <= parsed <= end:
+            return parsed
+        return None
+    except Exception:
+        return None
 
 
-# надсилає в чат текстове повідомлення та додає до нього кнопки
-async def send_text_buttons(
-    update: Update,
-    context: ContextTypes.DEFAULT_TYPE,
-    text: str = "",
-    buttons: dict = {},
-    columns: int = 2,
-) -> Message:
-    text = text.encode("utf16", errors="surrogatepass").decode("utf16")
-    keyboard = []
-    row = []
-    for i, (key, value) in enumerate(buttons.items()):
-        button = InlineKeyboardButton(str(value), callback_data=str(key))
-        row.append(button)
-        # when row is full, push it to keyboard and start a new row
-        if (i + 1) % columns == 0:
-            keyboard.append(row)
-            row = []
-    # append any remaining buttons
-    if row:
-        keyboard.append(row)
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    # reply in a way that works for both message and callback_query contexts
-    if getattr(update, "effective_message", None) is not None:
-        return await update.effective_message.reply_text(
-            text, reply_markup=reply_markup, parse_mode=ParseMode.MARKDOWN
-        )
-    # fallback to bot.send_message when no message object is available
-    chat_id = None
-    if getattr(update, "effective_chat", None) is not None:
-        chat_id = update.effective_chat.id
-    elif getattr(update, "message", None) is not None:
-        chat_id = update.message.chat.id
-    if chat_id is not None:
-        return await context.bot.send_message(
-            chat_id=chat_id,
-            text=text,
-            reply_markup=reply_markup,
-            parse_mode=ParseMode.MARKDOWN,
-        )
-    # last resort: raise informative error
-    raise RuntimeError("No chat/message available to send buttons reply")
+def validate_location(text: str, allowed_locations: list):
+    text_lower = text.lower()
+    for location in allowed_locations:
+        if location.lower() in text_lower:
+            return location
+    return None
 
 
-# надсилає в чат фото
-async def send_photo(
-    update: Update, context: ContextTypes.DEFAULT_TYPE, name: str
-) -> Message:
-    with open("resources/images/" + name + ".jpg", "rb") as photo:
-        return await context.bot.send_photo(
-            chat_id=update.effective_chat.id, photo=photo
-        )
-
-
-# відображає команди та головне меню
-async def show_main_menu(
-    update: Update, context: ContextTypes.DEFAULT_TYPE, commands: dict
-):
-    command_list = [BotCommand(key, value) for key, value in commands.items()]
-    await context.bot.set_my_commands(
-        command_list, scope=BotCommandScopeChat(chat_id=update.effective_chat.id)
-    )
-    await context.bot.set_chat_menu_button(
-        menu_button=MenuButtonCommands(), chat_id=update.effective_chat.id
-    )
-
-
-# приховує команди та головне меню
-async def hide_main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.delete_my_commands(
-        scope=BotCommandScopeChat(chat_id=update.effective_chat.id)
-    )
-    await context.bot.set_chat_menu_button(
-        menu_button=MenuButtonDefault(), chat_id=update.effective_chat.id
-    )
-
-
-# завантажує повідомлення з папки /resources/messages/
-def load_message(name):
-    with open("resources/messages/" + name + ".txt", "r", encoding="utf8") as file:
-        return file.read()
-
-
-# завантажує промпт з папки /resources/messages/
-def load_prompt(name):
-    with open("resources/prompts/" + name + ".txt", "r", encoding="utf8") as file:
-        return file.read()
+def validate_phone(text: str):
+    match = re.search(r"\+?\d{10,15}", text)
+    return match.group() if match else None

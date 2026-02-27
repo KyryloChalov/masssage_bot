@@ -12,7 +12,7 @@ from services.gpt_service import ChatGptService
 
 from include.from_env import TOKEN_TELEGRAM, TOKEN_GPT
 
-from include.util import header, show_main_menu
+from include.util_telegram import header, show_main_menu
 
 from include.buttons import BUTTONS_START, BUTTONS_MENU
 
@@ -52,9 +52,7 @@ async def main_button(update, context):
 
 def main():
     application = Application.builder().token(str(TOKEN_TELEGRAM)).build()
-
     gpt_service = ChatGptService(TOKEN_GPT, business_id=1)
-    # gpt_service = ChatGptService(TOKEN_GPT, business=1)
 
     application.add_handler(CommandHandler("start", start_bot))
     application.add_handler(get_order_conversation_handler())

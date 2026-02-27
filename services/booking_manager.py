@@ -1,48 +1,9 @@
-# services/booking_manager.py
-
 from services.booking_state import BookingStep, BookingState
-from include.util import extract_phone
-
-import re
-from datetime import datetime
+from include.util import validate_date, validate_time, validate_location, validate_phone
 
 
-def validate_date(text: str):
-    print("validate_date: ", text)
-    try:
-        parsed = datetime.strptime(text, "%d.%m.%Y")
-        print("validate_date >>> parsed: ", parsed)
-        if parsed.date() < datetime.today().date():
-            return None
-        return parsed.date()
-    except:
-        return None
-
-
-def validate_time(text: str, working_hours: tuple):
-    print("validate_time: ", text)
-    print("working_hours: ", working_hours)
-    try:
-        parsed = datetime.strptime(text, "%H:%M").time()
-        start, end = working_hours
-        if start <= parsed <= end:
-            return parsed
-        return None
-    except:
-        return None
-
-
-def validate_location(text: str, allowed_locations: list):
-    text_lower = text.lower()
-    for location in allowed_locations:
-        if location.lower() in text_lower:
-            return location
-    return None
-
-
-def validate_phone(text: str):
-    match = re.search(r"\+?\d{10,15}", text)
-    return match.group() if match else None
+# import re
+# from datetime import datetime
 
 
 class BookingOrchestrator:

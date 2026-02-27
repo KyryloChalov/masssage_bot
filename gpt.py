@@ -8,11 +8,11 @@ from telegram.ext import (
 )
 
 from include.from_env import TELEGRAM_KYRYLO_ID
-from include.util import header, extract_phone
+from include.util import extract_phone
+from include.util_telegram import header
 
 from include.colors import RED, RESET
 
-CONFIRM_MESSAGE = "Дякую! Передаю інформацію менеджеру.\n\n>>> Очікуйте на дзвінок 📞"
 
 GPT_CHAT = 1
 
@@ -31,13 +31,9 @@ def get_gpt_conversation_handler(gpt_service):
 
         # ---------- GPT RESPONSE ----------
         try:
-            print("chat >>> try >>> point 1")
-            # answer, gpt_history = await gpt_service.ask(user_id, user_text)
             answer = await gpt_service.ask(user_id, user_text)
-            print("chat >>> try >>> point 2")
 
             await my_message.edit_text(answer)
-            print("chat >>> try >>> point 3")
 
             # отримано номер телефону?
             phone = extract_phone(user_text)
@@ -45,17 +41,19 @@ def get_gpt_conversation_handler(gpt_service):
             if phone:
                 print("chat >>> phone: ", phone)
                 user = update.effective_user
+
+                await header(update, context, "thanks")
+
                 gpt_history = await gpt_service.history_from_db(user.id)
+                dialog = await parse_dialog_for_output(gpt_history)
 
                 order_data = {
                     "name": user.full_name,
                     "username": user.username,
                     "user_id": user.id,
                     "phone": phone,
-                    "dialog": gpt_history,
+                    "dialog": dialog,
                 }
-
-                await header(update, context, "thanks")
 
                 await notify_admin(context, order_data)
 
@@ -66,10 +64,17 @@ def get_gpt_conversation_handler(gpt_service):
             print(RED, f"Сталася помилка: {e}. Спробуйте пізніше", RESET)
         return GPT_CHAT
 
+    async def parse_dialog_for_output(dialog: list):
+        output = ""
+        for entry in dialog:
+            role = entry["role"]
+            content = entry["content"]
+            output += f"{role.upper()}: {content}\n\n"
+        return output
+
     async def stop_gpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         gpt_service.repo.clear_history(update.effective_user.id)
         await header(update, context)
-        # await update.message.reply_text("GPT режим завершено.")
         return ConversationHandler.END
 
     return ConversationHandler(
@@ -82,17 +87,16 @@ def get_gpt_conversation_handler(gpt_service):
 
 
 async def notify_admin(context, order_data):
-
     message = f"""
 🚀 СТАТУС: GPT режим
 🆕 НОВЕ GPT-ЗАМОВЛЕННЯ
 
-👤 Ім'я: {order_data.get("name")}
+👤 Ім'я:     {order_data.get("name")}
 📎 Username: @{order_data.get("username")}
-🆔 ID: {order_data.get("user_id")}
-📞 Телефон: {order_data.get("phone")}
+🆔 ID:       {order_data.get("user_id")}
+📞 Телефон:  {order_data.get("phone")}
 
-💬 Останній діалог:{order_data.get("dialog")}
+💬 Останній діалог:\n{order_data.get("dialog")}
 """
     await context.bot.send_message(chat_id=TELEGRAM_KYRYLO_ID, text=message)
 

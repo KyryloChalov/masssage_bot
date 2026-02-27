@@ -1,6 +1,3 @@
-# order.py
-
-import re
 from telegram import Update
 from telegram.ext import (
     ContextTypes,
@@ -10,7 +7,8 @@ from telegram.ext import (
     filters,
 )
 
-from include.util import header, extract_phone
+from include.util import extract_phone
+from include.util_telegram import header
 
 # ---- STATES ----
 ASK_PHONE, ASK_TIME, CONFIRM = range(3)

@@ -1,20 +1,18 @@
 import asyncio
 from openai import AsyncOpenAI
-# from ..models.business import Business
-from storage.gpt_repository import GptRepository
 
-from include.business_formatter import build_system_context
-from services.intent_filter import is_massage_related
+
+from repositories.business_formatter import build_system_context
 
 from services.intent_classifier import detect_intent, Intent
-
 from services.booking_manager import BookingOrchestrator
-
 from services.booking_state import BookingState, BookingStep
+from services.intent_filter import is_massage_related
+
+from storage.gpt_repository import GptRepository
 
 from repositories.business_repository import BusinessRepository
 
-# business = BusinessRepository.get(business_id)
 
 
 class ConversationState:
@@ -45,11 +43,11 @@ class ChatGptService:
 
     async def history_from_db(self, user_id: int):
         print("history_from_db >>> point 1")
-        # беремо історію і одразу віддаємо )
+        # беремо історію і одразу віддаємо (викликається з двох місць, тому виніс в окрему функцію)
         return self.repo.get_history(user_id, self.max_history)
 
     async def ask(self, user_id: int, user_message: str):
-        
+
         # тут GPT-логіка
         print("ask >>> point 1")
         # 1️⃣ зберігаємо повідомлення користувача
@@ -71,18 +69,21 @@ class ChatGptService:
 
         print("ask >>> point 3")
         # 0️⃣➕➕ важливий нюанс — якщо ми в процесі бронювання, то неважливо, що запитує користувач. Ми повинні довести бронювання до кінця.
-        print('ask >>> state.step: ', state.step)
+        print("ask >>> state.step: ", state.step)
         if state.step != BookingStep.IDLE or intent == Intent.BOOKING:
             return self.booking_manager.handle(state, user_message)
 
-        print("ask >>> point 4")
-        # 0️⃣➕
-        if intent == Intent.OTHER:
-            return "Я можу допомогти лише з питаннями щодо послуг масажу Home.Masssage 🙌 Якщо вас цікавить запис або консультація — із радістю допоможу."
+        # цей запобіжник спрацьовує занадто часто, тому поки що вимкнув. 
+        # Але він потрібен, щоб не перевантажувати GPT запитами, які не стосуються масажу.
+        # print("ask >>> point 4")
+        # # 0️⃣➕
+        # if intent == Intent.OTHER:
+        #     return "Я можу допомогти лише з питаннями щодо послуг масажу Home.Masssage 🙌 Якщо вас цікавить запис або консультація — із радістю допоможу."
 
         print("ask >>> point 5")
         # 2️⃣ беремо історію
-        history = self.repo.get_history(user_id, self.max_history)
+        history = await self.history_from_db(user_id)
+        # history = self.repo.get_history(user_id, self.max_history)
 
         print("ask >>> point 6")
         # 3️⃣ додаємо system prompt
@@ -117,7 +118,7 @@ class ChatGptService:
                 if attempt == 2:
                     raise
                 await asyncio.sleep(2)
-                
+
         if state.step in (BookingStep.CANCELLED, BookingStep.COMPLETED):
             self.user_states.pop(user_id, None)
 
