@@ -12,7 +12,6 @@ from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
-
 import inspect
 
 from include.util import log_decorator
@@ -149,7 +148,7 @@ def load_message(name):
         return file.read()
 
 
-# завантажує промпт з папки /resources/messages/
-def load_prompt(name):
-    with open("resources/prompts/" + name + ".txt", "r", encoding="utf8") as file:
-        return file.read()
+# # завантажує промпт з папки /resources/prompts/
+# def load_prompt(name):
+#     with open("resources/prompts/" + name + ".txt", "r", encoding="utf8") as file:
+#         return file.read()

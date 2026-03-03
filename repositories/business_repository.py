@@ -1,5 +1,5 @@
 from datetime import time
-from repositories.business_info import BUSINESS_INFO
+from business.business_info import BUSINESS_INFO
 from model.business import Business
 
 

@@ -2,7 +2,7 @@ import asyncio
 from openai import AsyncOpenAI
 
 
-from repositories.business_formatter import build_system_context
+from business.business_formatter import build_system_context
 
 from services.intent_classifier import detect_intent, Intent
 from services.booking_manager import BookingOrchestrator
