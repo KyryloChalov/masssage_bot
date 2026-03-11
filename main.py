@@ -40,6 +40,7 @@ async def main_button(update, context):
     except Exception:
         pass
 
+
 # 🧠 Важливий нюанс (професійний рівень)
 # Якщо ти плануєш:
 # багато бізнесів
@@ -49,6 +50,7 @@ async def main_button(update, context):
 # Треба створювати його динамічно:
 # def get_gpt_service(business_id):
 #     return ChatGptService(business_id)
+
 
 def main():
     application = Application.builder().token(str(TOKEN_TELEGRAM)).build()
